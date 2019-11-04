@@ -17,6 +17,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 	"testing"
 
@@ -805,31 +806,33 @@ func TestTraintupleWithSingleDatasampleComposite(t *testing.T) {
 // 	assert.EqualValuesf(t, 404, resp.Status, "when querying the traintuple - status %d and message %s", resp.Status, resp.Message)
 // }
 
-// func TestInsertTraintupleTwiceComposite(t *testing.T) {
-// 	scc := new(SubstraChaincode)
-// 	mockStub := NewMockStubWithRegisterNode("substra", scc)
-// 	registerItem(t, *mockStub, "algo")
+func TestInsertTraintupleTwiceComposite(t *testing.T) {
+	scc := new(SubstraChaincode)
+	mockStub := NewMockStubWithRegisterNode("substra", scc)
+	registerItem(t, *mockStub, "algo")
 
-// 	// create a traintuple and start a ComplutePlan
-// 	inpTraintuple := inputCompositeTraintuple{
-// 		Rank: "0",
-// 	}
-// 	inpTraintuple.createDefault()
-// 	resp := mockStub.MockInvoke("42", methodAndAssetToByte("createTraintuple", inpTraintuple))
-// 	assert.EqualValues(t, http.StatusOK, resp.Status)
+	// create a composite traintuple and start a ComplutePlan
+	inpTraintuple := inputCompositeTraintuple{
+		Rank: "0",
+	}
+	inpTraintuple.createDefault()
+	resp := mockStub.MockInvoke("42", methodAndAssetToByte("createCompositeTraintuple", inpTraintuple))
+	assert.EqualValues(t, http.StatusOK, resp.Status)
+	var _key struct{ Key string }
+	json.Unmarshal(resp.Payload, &_key)
 
-// 	// create a second traintuple in the same ComputePlan
-// 	inpTraintuple.Rank = "1"
-// 	inpTraintuple.ComputePlanID = traintupleKey
-// 	inpTraintuple.InModels = []string{traintupleKey}
-// 	resp = mockStub.MockInvoke("42", methodAndAssetToByte("createTraintuple", inpTraintuple))
-// 	assert.EqualValues(t, http.StatusOK, resp.Status)
+	// create a second composite traintuple in the same ComputePlan
+	inpTraintuple.Rank = "1"
+	inpTraintuple.ComputePlanID = _key.Key
+	inpTraintuple.InHeadModelKey = _key.Key
+	inpTraintuple.InTrunkModelKey = _key.Key
+	resp = mockStub.MockInvoke("42", methodAndAssetToByte("createCompositeTraintuple", inpTraintuple))
+	assert.EqualValues(t, http.StatusOK, resp.Status)
 
-// 	// re-insert the same traintuple and expect a conflict error
-// 	resp = mockStub.MockInvoke("42", methodAndAssetToByte("createTraintuple", inpTraintuple))
-// 	assert.EqualValues(t, http.StatusConflict, resp.Status)
-
-// }
+	// re-insert the same composite traintuple and expect a conflict error
+	resp = mockStub.MockInvoke("42", methodAndAssetToByte("createCompositeTraintuple", inpTraintuple))
+	assert.EqualValues(t, http.StatusConflict, resp.Status)
+}
 
 // func TestRecursiveLogFailedComposite(t *testing.T) {
 // 	scc := new(SubstraChaincode)
