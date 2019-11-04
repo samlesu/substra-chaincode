@@ -838,32 +838,47 @@ func TestTraintupleWithSingleDatasampleComposite(t *testing.T) {
 // 	registerItem(t, *mockStub, "traintuple")
 // 	db := NewLedgerDB(mockStub)
 
-// 	childtraintuple := inputTraintuple{}
+// 	childtraintuple := inputCompositeTraintuple{}
 // 	childtraintuple.createDefault()
-// 	childtraintuple.InModels = []string{traintupleKey}
+
+// 	head, err := registerTraintuple(mockStub, CompositeTraintupleType, []string{trainDataSampleHash1})
+// 	assert.NoError(t, err)
+// 	childtraintuple.InHeadModelKey = head
+
+// 	trunk, err := registerTraintuple(mockStub, CompositeTraintupleType, []string{trainDataSampleHash2})
+// 	assert.NoError(t, err)
+// 	childtraintuple.InHeadModelKey = trunk
+
 // 	childResp, err := createTraintuple(db, assetToArgs(childtraintuple))
 // 	assert.NoError(t, err)
 
-// 	grandChildtraintuple := inputTraintuple{}
+// 	childKey := childResp["key"]
+// 	// args := [][]byte{[]byte("queryCompositeTraintuple"), keyToJSON(childKey)}
+// 	// resp := mockStub.MockInvoke("42", args)
+// 	// child := outputCompositeTraintuple{}
+// 	// json.Unmarshal(resp.Payload, &child)
+
+// 	grandChildtraintuple := inputCompositeTraintuple{}
 // 	grandChildtraintuple.createDefault()
-// 	grandChildtraintuple.InModels = []string{childResp["key"]}
+// 	grandChildtraintuple.InHeadModelKey = childKey
+// 	grandChildtraintuple.InTrunkModelKey = childKey
 // 	grandChildresp, err := createTraintuple(db, assetToArgs(grandChildtraintuple))
 // 	assert.NoError(t, err)
 
-// 	grandChildtesttuple := inputTesttuple{TraintupleKey: traintupleKey}
+// 	grandChildtesttuple := inputCompositeTesttuple{TraintupleKey: traintupleKey}
 // 	testResp, err := createTesttuple(db, assetToArgs(grandChildtesttuple))
 // 	assert.NoError(t, err)
 
-// 	_, err = logStartTrain(db, assetToArgs(inputHash{Key: traintupleKey}))
+// 	_, err = logStartCompositeTrain(db, assetToArgs(inputHash{Key: traintupleKey}))
 // 	assert.NoError(t, err)
-// 	_, err = logFailTrain(db, assetToArgs(inputHash{Key: traintupleKey}))
+// 	_, err = logFailCompositeTrain(db, assetToArgs(inputHash{Key: traintupleKey}))
 // 	assert.NoError(t, err)
 
-// 	train2, err := db.GetTraintuple(grandChildresp["key"])
+// 	train2, err := db.GetCompositeTraintuple(grandChildresp["key"])
 // 	assert.NoError(t, err)
 // 	assert.Equal(t, StatusFailed, train2.Status)
 
-// 	test, err := db.GetTesttuple(testResp["key"])
+// 	test, err := db.GetCompositeTesttuple(testResp["key"])
 // 	assert.NoError(t, err)
 // 	assert.Equal(t, StatusFailed, test.Status)
 // }
