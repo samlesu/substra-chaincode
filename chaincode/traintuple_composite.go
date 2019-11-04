@@ -424,7 +424,7 @@ func logFailCompositeTrain(db LedgerDB, args []string) (outputTraintuple outputC
 	return
 }
 
-// queryTraintuple returns info about a traintuple given its key
+// queryCompositeTraintuple returns info about a composite traintuple given its key
 func queryCompositeTraintuple(db LedgerDB, args []string) (outputTraintuple outputCompositeTraintuple, err error) {
 	inp := inputHash{}
 	err = AssetFromJSON(args, &inp)
@@ -443,7 +443,7 @@ func queryCompositeTraintuple(db LedgerDB, args []string) (outputTraintuple outp
 	return
 }
 
-// queryTraintuples returns all traintuples
+// queryCompositeTraintuples returns all composite traintuples
 func queryCompositeTraintuples(db LedgerDB, args []string) ([]outputCompositeTraintuple, error) {
 	outTraintuples := []outputCompositeTraintuple{}
 
