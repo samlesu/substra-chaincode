@@ -160,41 +160,49 @@ func TestCreateCompositeTraintupleInModels(t *testing.T) {
 }
 
 func TestTraintupleInModelTypes(t *testing.T) {
-	// Head: can only be a composite traintuple's head out model
-	// Trunk: it can be either:
+	// Head can only be a composite traintuple's head out model
+	allowedHeadTypes := map[AssetType]bool{
+		TraintupleType:          false,
+		CompositeTraintupleType: true,
+		// TODO: AggregateTraintuple
+	}
+
+	// Trunk can be either:
 	// - a traintuple's out model
 	// - a composite traintuple's head out model
 	// - an aggregate traintuple's out model
-	for _, headType := range []AssetType{CompositeTraintupleType} {
-		for _, trunkType := range []AssetType{TraintupleType, CompositeTraintupleType /* TODO: AggregateTraintupleType */} {
-			testName := fmt.Sprintf("TestTraintuple_%s_HeadInModel_%s_TrunkInModel", headType, trunkType)
+	allowedTrunkTypes := map[AssetType]bool{
+		TraintupleType:          true,
+		CompositeTraintupleType: true,
+		// TODO: AggregateTraintuple
+	}
+
+	for headType, validHeadType := range allowedHeadTypes {
+		for trunkType, validTrunkType := range allowedTrunkTypes {
+			// Traintuple creation should succeed only if both
+			// in-model types are valid
+			shouldSucceed := validHeadType && validTrunkType
+
+			successStr := "ShouldSucceed"
+			if !shouldSucceed {
+				successStr = "ShouldFail"
+			}
+
+			testName := fmt.Sprintf("TestTraintuple_%sHeadInModel_%sTrunkInModel_%s", headType, trunkType, successStr)
+
 			t.Run(testName, func(t *testing.T) {
-				testTraintupleInModelTypes(t, headType, trunkType)
+				testTraintupleInModelTypes(t, headType, trunkType, shouldSucceed)
 			})
 		}
 	}
 }
 
-func testTraintupleInModelTypes(t *testing.T, headType AssetType, trunkType AssetType) {
+func testTraintupleInModelTypes(t *testing.T, headType AssetType, trunkType AssetType, shouldSucceed bool) {
 	scc := new(SubstraChaincode)
 	mockStub := NewMockStubWithRegisterNode("substra", scc)
-	registerItem(t, *mockStub, "trainDataset")
+	registerItem(t, *mockStub, "compositealgo")
 
-	objHash := strings.ReplaceAll(objectiveDescriptionHash, "1", "2")
-	inpObjective := inputObjective{DescriptionHash: objHash}
-	inpObjective.createDefault()
-	inpObjective.TestDataset = inputDataset{}
-	resp := mockStub.MockInvoke("42", methodAndAssetToByte("registerObjective", inpObjective))
-
-	inpAlgo := inputAlgo{}
-	args := inpAlgo.createDefault()
-	resp = mockStub.MockInvoke("42", args)
-
-	inpCompAlgo := inputCompositeAlgo{}
-	args = inpCompAlgo.createDefault()
-	resp = mockStub.MockInvoke("42", args)
-
-	inpTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
+	inpTraintuple := inputCompositeTraintuple{}
 
 	head, err := registerTraintuple(mockStub, headType, []string{trainDataSampleHash1})
 	assert.NoError(t, err)
@@ -206,8 +214,14 @@ func testTraintupleInModelTypes(t *testing.T, headType AssetType, trunkType Asse
 
 	// create composite traintuple
 	inpTraintuple.fillDefaults()
-	args = inpTraintuple.getArgs()
-	resp = mockStub.MockInvoke("42", args)
+	args := inpTraintuple.getArgs()
+	resp := mockStub.MockInvoke("42", args)
+
+	if !shouldSucceed {
+		assert.EqualValues(t, 404, resp.Status, "It should NOT be possible to register a traintuple with a %s head and a %s trunk: %s", headType, trunkType, resp.Message)
+		return
+	}
+
 	assert.EqualValues(t, 200, resp.Status, "It should be possible to register a traintuple with a %s head and a %s trunk: %s", headType, trunkType, resp.Message)
 	var keyOnly struct{ Key string }
 	json.Unmarshal(resp.Payload, &keyOnly)
