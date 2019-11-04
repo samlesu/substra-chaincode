@@ -41,9 +41,9 @@ func (traintuple *CompositeTraintuple) SetFromInput(db LedgerDB, inp inputCompos
 	traintuple.AssetType = CompositeTraintupleType
 	traintuple.Creator = creator
 	traintuple.Tag = inp.Tag
-	algo, err := db.GetAlgo(inp.AlgoKey)
+	algo, err := db.GetCompositeAlgo(inp.AlgoKey)
 	if err != nil {
-		return errors.BadRequest(err, "could not retrieve algo with key %s", inp.AlgoKey)
+		return errors.BadRequest(err, "could not retrieve Composite algo with key %s", inp.AlgoKey)
 	}
 	if !algo.Permissions.CanProcess(algo.Owner, creator) {
 		return errors.Forbidden("not authorized to process algo %s", inp.AlgoKey)

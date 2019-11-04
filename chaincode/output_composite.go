@@ -57,9 +57,9 @@ func (outputCompositeTraintuple *outputCompositeTraintuple) Fill(db LedgerDB, tr
 		Permissions: getOutPermissions(traintuple.OutTrunkModel.Permissions)}
 	outputCompositeTraintuple.Tag = traintuple.Tag
 	// fill algo
-	algo, err := db.GetAlgo(traintuple.AlgoKey)
+	algo, err := db.GetCompositeAlgo(traintuple.AlgoKey)
 	if err != nil {
-		err = fmt.Errorf("could not retrieve algo with key %s - %s", traintuple.AlgoKey, err.Error())
+		err = fmt.Errorf("could not retrieve composite algo with key %s - %s", traintuple.AlgoKey, err.Error())
 		return
 	}
 	outputCompositeTraintuple.Algo = &HashDressName{
