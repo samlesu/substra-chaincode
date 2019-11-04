@@ -119,7 +119,7 @@ func GetTxCreator(stub shim.ChaincodeStubInterface) (string, error) {
 	return sID.GetMspid(), nil
 }
 
-// ToString returns a string representation for an asset type
+// String returns a string representation for an asset type
 func (assetType AssetType) String() string {
 	switch assetType {
 	case ObjectiveType:
@@ -141,7 +141,7 @@ func (assetType AssetType) String() string {
 	}
 }
 
-// ToString returns a string representation for a composite model type
+// String returns a string representation for a composite model type
 func (modelType CompositeModelType) String() string {
 	switch modelType {
 	case HeadType:

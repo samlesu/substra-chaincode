@@ -663,15 +663,9 @@ func testTraintupleInModelTypes(t *testing.T, headType AssetType, trunkType Asse
 
 	require.NotNil(t, traintuple.InModelHead)
 	assert.EqualValues(t, inpTraintuple.InHeadModelKey, traintuple.InModelHead.TraintupleKey)
-	// TODO: test that fields are populated once parent traintuple is "done"
-	// assert.NotEqual(t, "", traintuple.InModelHead.Hash)
-	// assert.NotEqual(t, "", traintuple.InModelHead.StorageAddress)
 
 	require.NotNil(t, traintuple.InModelTrunk)
 	assert.EqualValues(t, inpTraintuple.InTrunkModelKey, traintuple.InModelTrunk.TraintupleKey)
-	// TODO: test that fields are populated once parent traintuple is "done"
-	// assert.NotEqual(t, "", traintuple.InModelTrunk.Hash)
-	// assert.NotEqual(t, "", traintuple.InModelTrunk.StorageAddress)
 }
 
 func TestTraintuplePermissions(t *testing.T) {
