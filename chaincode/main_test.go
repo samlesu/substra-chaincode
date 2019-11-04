@@ -219,6 +219,39 @@ func registerItem(t *testing.T, mockStub MockStub, itemType string) (peer.Respon
 	return resp, inpCompositeTraintuple
 }
 
+func registerTraintuple(mockStub *MockStub, assetType AssetType, dataSampleKeys []string) (key string, err error) {
+	switch assetType {
+	case CompositeTraintupleType:
+		inpTraintuple := inputCompositeTraintuple{AlgoKey: compositeAlgoHash}
+		inpTraintuple.DataSampleKeys = dataSampleKeys
+		inpTraintuple.fillDefaults()
+		args := inpTraintuple.getArgs()
+		resp := mockStub.MockInvoke("42", args)
+		if resp.Status != 200 {
+			err = fmt.Errorf("Failed to register traintuple: %s", resp.Message)
+			return
+		}
+		var _key struct{ Key string }
+		json.Unmarshal(resp.Payload, &_key)
+		return _key.Key, nil
+	case TraintupleType:
+		inpTraintuple := inputTraintuple{}
+		inpTraintuple.DataSampleKeys = dataSampleKeys
+		args := inpTraintuple.createDefault()
+		resp := mockStub.MockInvoke("42", args)
+		if resp.Status != 200 {
+			err = fmt.Errorf("Failed to register traintuple: %s", resp.Message)
+			return
+		}
+		var _key struct{ Key string }
+		json.Unmarshal(resp.Payload, &_key)
+		return _key.Key, nil
+	default:
+		err = fmt.Errorf("Invalid asset type: %v", assetType)
+		return
+	}
+}
+
 func printResp(buf io.Writer, payload []byte) {
 	var toPrint []byte
 	if strings.HasPrefix(string(payload), "{") {

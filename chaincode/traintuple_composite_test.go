@@ -159,39 +159,6 @@ func TestCreateCompositeTraintupleInModels(t *testing.T) {
 	}
 }
 
-func registerTraintuple(mockStub *MockStub, assetType AssetType, dataSampleKeys []string) (key string, err error) {
-	switch assetType {
-	case CompositeTraintupleType:
-		inpTraintuple := inputCompositeTraintuple{AlgoKey: compositeAlgoHash}
-		inpTraintuple.DataSampleKeys = dataSampleKeys
-		inpTraintuple.fillDefaults()
-		args := inpTraintuple.getArgs()
-		resp := mockStub.MockInvoke("42", args)
-		if resp.Status != 200 {
-			err = fmt.Errorf("Failed to register traintuple: %s", resp.Message)
-			return
-		}
-		var _key struct{ Key string }
-		json.Unmarshal(resp.Payload, &_key)
-		return _key.Key, nil
-	case TraintupleType:
-		inpTraintuple := inputTraintuple{}
-		inpTraintuple.DataSampleKeys = dataSampleKeys
-		args := inpTraintuple.createDefault()
-		resp := mockStub.MockInvoke("42", args)
-		if resp.Status != 200 {
-			err = fmt.Errorf("Failed to register traintuple: %s", resp.Message)
-			return
-		}
-		var _key struct{ Key string }
-		json.Unmarshal(resp.Payload, &_key)
-		return _key.Key, nil
-	default:
-		err = fmt.Errorf("Invalid asset type: %v", assetType)
-		return
-	}
-}
-
 func TestTraintupleInModelTypes(t *testing.T) {
 	// Head: can only be a composite traintuple's head out model
 	// Trunk: it can be either:

@@ -310,7 +310,14 @@ func (db *LedgerDB) GetOutModelHashDress(traintupleKey string, modelType Composi
 		}
 	}
 
-	return nil, errors.NotFound("GetOutModelHashDress: Could not find traintuple %s with key \"%s\"", modelType, traintupleKey)
+	allowedStr := ""
+	for idx, assetType := range allowedAssetTypes {
+		if idx != 0 {
+			allowedStr = allowedStr + ", "
+		}
+		allowedStr = allowedStr + assetType.String()
+	}
+	return nil, errors.NotFound("GetOutModelHashDress: Could not find traintuple %s with key \"%s\". Allowed types: {%s}.", modelType, traintupleKey, allowedStr)
 }
 
 // GetTesttuple fetches a Testtuple from the ledger using its unique key
