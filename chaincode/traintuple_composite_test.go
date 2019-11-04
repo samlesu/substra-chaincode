@@ -489,69 +489,73 @@ func TestTraintupleWithSingleDatasampleComposite(t *testing.T) {
 // 	assert.EqualValues(t, traintupleKey, errorPayload["key"], "key in error should be traintupleKey")
 // }
 
-// func TestTraintupleMultipleCommputePlanCreationsComposite(t *testing.T) {
-// 	scc := new(SubstraChaincode)
-// 	mockStub := NewMockStubWithRegisterNode("substra", scc)
+func TestTraintupleMultipleCommputePlanCreationsComposite(t *testing.T) {
+	scc := new(SubstraChaincode)
+	mockStub := NewMockStubWithRegisterNode("substra", scc)
 
-// 	// Add a some dataManager, dataSample and traintuple
-// 	registerItem(t, *mockStub, "algo")
+	// Add a some dataManager, dataSample and traintuple
+	registerItem(t, *mockStub, "compositeAlgo")
 
-// 	inpTraintuple := inputCompositeTraintuple{Rank: "0"}
-// 	args := inpTraintuple.createDefault()
-// 	resp := mockStub.MockInvoke("42", args)
-// 	assert.EqualValues(t, 200, resp.Status)
-// 	res := map[string]string{}
-// 	err := json.Unmarshal(resp.Payload, &res)
-// 	assert.NoError(t, err, "should unmarshal without problem")
-// 	assert.Contains(t, res, "key")
-// 	key := res["key"]
-// 	// Failed to add a traintuple with the same rank
-// 	inpTraintuple = inputCompositeTraintuple{
-// 		InModels:      []string{key},
-// 		Rank:          "0",
-// 		ComputePlanID: key}
-// 	args = inpTraintuple.createDefault()
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValues(t, 400, resp.Status, resp.Message, "should failed to add a traintuple of the same rank")
+	inpTraintuple := inputCompositeTraintuple{Rank: "0"}
+	args := inpTraintuple.createDefault()
+	resp := mockStub.MockInvoke("42", args)
+	assert.EqualValues(t, 200, resp.Status)
+	res := map[string]string{}
+	err := json.Unmarshal(resp.Payload, &res)
+	assert.NoError(t, err, "should unmarshal without problem")
+	assert.Contains(t, res, "key")
+	key := res["key"]
+	// Failed to add a traintuple with the same rank
+	inpTraintuple = inputCompositeTraintuple{
+		InHeadModelKey:  key,
+		InTrunkModelKey: key,
+		Rank:            "0",
+		ComputePlanID:   key}
+	args = inpTraintuple.createDefault()
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValues(t, 400, resp.Status, resp.Message, "should failed to add a traintuple of the same rank")
 
-// 	// Failed to add a traintuple to an unexisting CommputePlan
-// 	inpTraintuple = inputCompositeTraintuple{
-// 		InModels:      []string{key},
-// 		Rank:          "1",
-// 		ComputePlanID: "notarealone"}
-// 	args = inpTraintuple.createDefault()
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValues(t, 400, resp.Status, resp.Message, "should failed to add a traintuple to an unexisting ComputePlanID")
+	// Failed to add a traintuple to an unexisting CommputePlan
+	inpTraintuple = inputCompositeTraintuple{
+		InHeadModelKey:  key,
+		InTrunkModelKey: key,
+		Rank:            "1",
+		ComputePlanID:   "notarealone"}
+	args = inpTraintuple.createDefault()
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValues(t, 400, resp.Status, resp.Message, "should failed to add a traintuple to an unexisting ComputePlanID")
 
-// 	// Succesfully add a traintuple to the same ComputePlanID
-// 	inpTraintuple = inputCompositeTraintuple{
-// 		InModels:      []string{key},
-// 		Rank:          "1",
-// 		ComputePlanID: key}
-// 	args = inpTraintuple.createDefault()
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValues(t, 200, resp.Status, resp.Message, "should be able do create a traintuple with the same ComputePlanID")
-// 	err = json.Unmarshal(resp.Payload, &res)
-// 	assert.NoError(t, err, "should unmarshal without problem")
-// 	assert.Contains(t, res, "key")
-// 	ttkey := res["key"]
-// 	// Add new algo to check all ComputePlan algo consistency
-// 	newAlgoHash := strings.Replace(algoHash, "a", "b", 1)
-// 	inpAlgo := inputAlgo{Hash: newAlgoHash}
-// 	args = inpAlgo.createDefault()
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValues(t, 200, resp.Status)
+	// Succesfully add a traintuple to the same ComputePlanID
+	inpTraintuple = inputCompositeTraintuple{
+		InHeadModelKey:  key,
+		InTrunkModelKey: key,
+		Rank:            "1",
+		ComputePlanID:   key}
+	args = inpTraintuple.createDefault()
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValues(t, 200, resp.Status, resp.Message, "should be able do create a traintuple with the same ComputePlanID")
+	err = json.Unmarshal(resp.Payload, &res)
+	assert.NoError(t, err, "should unmarshal without problem")
+	assert.Contains(t, res, "key")
+	ttkey := res["key"]
+	// Add new algo to check all ComputePlan algo consistency
+	newAlgoHash := strings.Replace(compositeAlgoHash, "a", "b", 1)
+	inpAlgo := inputCompositeAlgo{inputAlgo{Hash: newAlgoHash}}
+	args = inpAlgo.createDefault()
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValues(t, 200, resp.Status)
 
-// 	inpTraintuple = inputCompositeTraintuple{
-// 		AlgoKey:       newAlgoHash,
-// 		InModels:      []string{ttkey},
-// 		Rank:          "2",
-// 		ComputePlanID: key}
-// 	args = inpTraintuple.createDefault()
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValues(t, 400, resp.Status, resp.Message, "sould fail for it doesn't have the same algo key")
-// 	assert.Contains(t, resp.Message, "does not have the same algo key")
-// }
+	inpTraintuple = inputCompositeTraintuple{
+		AlgoKey:         newAlgoHash,
+		InHeadModelKey:  ttkey,
+		InTrunkModelKey: ttkey,
+		Rank:            "2",
+		ComputePlanID:   key}
+	args = inpTraintuple.createDefault()
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValues(t, 400, resp.Status, resp.Message, "should fail for it doesn't have the same composite algo key")
+	assert.Contains(t, resp.Message, "does not have the same algo key")
+}
 
 // // func TestTesttupleOnFailedTraintuple(t *testing.T) {
 // // 	scc := new(SubstraChaincode)
@@ -606,6 +610,7 @@ func TestTraintupleWithSingleDatasampleComposite(t *testing.T) {
 // // 	assert.True(t, testtuples[0]["certified"].(bool), "... and it should be certified")
 
 // // }
+
 // // func TestConflictCertifiedNonCertifiedTesttuple(t *testing.T) {
 // // 	scc := new(SubstraChaincode)
 // // 	mockStub := NewMockStubWithRegisterNode("substra", scc)
