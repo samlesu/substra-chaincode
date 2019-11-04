@@ -496,7 +496,7 @@ func TestTraintupleMultipleCommputePlanCreationsComposite(t *testing.T) {
 	mockStub := NewMockStubWithRegisterNode("substra", scc)
 
 	// Add a some dataManager, dataSample and traintuple
-	registerItem(t, *mockStub, "compositeAlgo")
+	registerItem(t, *mockStub, "compositealgo")
 
 	inpTraintuple := inputCompositeTraintuple{Rank: "0"}
 	args := inpTraintuple.createDefault()
@@ -651,153 +651,160 @@ func TestTraintupleMultipleCommputePlanCreationsComposite(t *testing.T) {
 // // 	assert.Contains(t, resp.Message, "already exists")
 // // }
 
-// func TestCompositeTraintuple(t *testing.T) {
-// 	scc := new(SubstraChaincode)
-// 	mockStub := NewMockStubWithRegisterNode("substra", scc)
+func TestCompositeTraintuple(t *testing.T) {
+	scc := new(SubstraChaincode)
+	mockStub := NewMockStubWithRegisterNode("substra", scc)
 
-// 	// Add traintuple with invalid field
-// 	inpTraintuple := inputCompositeTraintuple{
-// 		AlgoKey: "aaa",
-// 	}
-// 	args := inpTraintuple.createDefault()
-// 	resp := mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 400, resp.Status, "when adding objective with invalid hash, status %d and message %s", resp.Status, resp.Message)
+	// Add traintuple with invalid field
+	inpTraintuple := inputCompositeTraintuple{
+		AlgoKey: "aaa",
+	}
+	args := inpTraintuple.createDefault()
+	resp := mockStub.MockInvoke("42", args)
+	assert.EqualValuesf(t, 400, resp.Status, "when adding objective with invalid hash, status %d and message %s", resp.Status, resp.Message)
 
-// 	// Add traintuple with unexisting algo
-// 	inpTraintuple = inputCompositeTraintuple{}
-// 	args = inpTraintuple.createDefault()
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 400, resp.Status, "when adding traintuple with unexisting algo, status %d and message %s", resp.Status, resp.Message)
+	// Add traintuple with unexisting algo
+	inpTraintuple = inputCompositeTraintuple{}
+	args = inpTraintuple.createDefault()
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValuesf(t, 400, resp.Status, "when adding composite traintuple with unexisting algo, status %d and message %s", resp.Status, resp.Message)
 
-// 	// Properly add traintuple
-// 	resp, tt := registerItem(t, *mockStub, "traintuple")
+	// Properly add traintuple
+	resp, tt := registerItem(t, *mockStub, "compositetraintuple")
 
-// 	inpTraintuple = tt.(inputCompositeTraintuple)
-// 	res := map[string]string{}
-// 	err := json.Unmarshal(resp.Payload, &res)
-// 	assert.NoError(t, err, "traintuple should unmarshal without problem")
-// 	assert.Contains(t, res, "key")
-// 	traintupleKey := res["key"]
-// 	// Query traintuple from key and check the consistency of returned arguments
-// 	args = [][]byte{[]byte("queryTraintuple"), keyToJSON(traintupleKey)}
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 200, resp.Status, "when querying the traintuple - status %d and message %s", resp.Status, resp.Message)
-// 	out := outputCompositeTraintuple{}
-// 	err = json.Unmarshal(resp.Payload, &out)
-// 	assert.NoError(t, err, "when unmarshalling queried traintuple")
-// 	expected := outputCompositeTraintuple{
-// 		Key: traintupleKey,
-// 		Algo: &HashDressName{
-// 			Hash:           algoHash,
-// 			Name:           algoName,
-// 			StorageAddress: algoStorageAddress,
-// 		},
-// 		Creator: worker,
-// 		Dataset: &TtDataset{
-// 			DataSampleKeys: []string{trainDataSampleHash1, trainDataSampleHash2},
-// 			OpenerHash:     dataManagerOpenerHash,
-// 			Perf:           0.0,
-// 			Worker:         worker,
-// 		},
-// 		Objective: &TtObjective{
-// 			Key: objectiveDescriptionHash,
-// 			Metrics: &HashDress{
-// 				Hash:           objectiveMetricsHash,
-// 				StorageAddress: objectiveMetricsStorageAddress,
-// 			},
-// 		},
-// 		Permissions: outputPermissions{
-// 			Process: Permission{Public: true, AuthorizedIDs: []string{}},
-// 		},
-// 		Status: StatusTodo,
-// 	}
-// 	assert.Exactly(t, expected, out, "the traintuple queried from the ledger differ from expected")
+	inpTraintuple = tt.(inputCompositeTraintuple)
+	res := map[string]string{}
+	err := json.Unmarshal(resp.Payload, &res)
+	assert.NoError(t, err, "composite traintuple should unmarshal without problem")
+	assert.Contains(t, res, "key")
+	traintupleKey := res["key"]
+	// Query traintuple from key and check the consistency of returned arguments
+	args = [][]byte{[]byte("queryCompositeTraintuple"), keyToJSON(traintupleKey)}
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValuesf(t, 200, resp.Status, "when querying the composite traintuple - status %d and message %s", resp.Status, resp.Message)
+	out := outputCompositeTraintuple{}
+	err = json.Unmarshal(resp.Payload, &out)
+	assert.NoError(t, err, "when unmarshalling queried composite traintuple")
+	expected := outputCompositeTraintuple{
+		Key: compositeTraintupleKey,
+		Algo: &HashDressName{
+			Hash:           compositeAlgoHash,
+			Name:           compositeAlgoName,
+			StorageAddress: compositeAlgoStorageAddress,
+		},
+		Creator: worker,
+		Dataset: &TtDataset{
+			DataSampleKeys: []string{trainDataSampleHash1, trainDataSampleHash2},
+			OpenerHash:     dataManagerOpenerHash,
+			Perf:           0.0,
+			Worker:         worker,
+		},
+		Objective: &TtObjective{
+			Key: objectiveDescriptionHash,
+			Metrics: &HashDress{
+				Hash:           objectiveMetricsHash,
+				StorageAddress: objectiveMetricsStorageAddress,
+			},
+		},
+		OutHeadModel: outModelComposite{
+			Permissions: outputPermissions{
+				Process: Permission{Public: false, AuthorizedIDs: []string{worker}},
+			},
+		},
+		OutTrunkModel: outModelComposite{
+			Permissions: outputPermissions{
+				Process: Permission{Public: true, AuthorizedIDs: []string{}},
+			},
+		},
+		Status: StatusTodo,
+	}
+	assert.Exactly(t, expected, out, "the composite traintuple queried from the ledger differ from expected")
 
-// 	// Query all traintuples and check consistency
-// 	args = [][]byte{[]byte("queryTraintuples")}
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 200, resp.Status, "when querying traintuples - status %d and message %s", resp.Status, resp.Message)
-// 	// TODO add traintuple key to output struct
-// 	// For now we test it as cleanly as its added to the query response
-// 	assert.Contains(t, string(resp.Payload), "key\":\""+traintupleKey)
-// 	var queryTraintuples []outputCompositeTraintuple
-// 	err = json.Unmarshal(resp.Payload, &queryTraintuples)
-// 	assert.NoError(t, err, "traintuples should unmarshal without problem")
-// 	assert.Exactly(t, out, queryTraintuples[0])
+	// // Query all traintuples and check consistency
+	// args = [][]byte{[]byte("queryCompositeTraintuples")}
+	// resp = mockStub.MockInvoke("42", args)
+	// assert.EqualValuesf(t, 200, resp.Status, "when querying composite traintuples - status %d and message %s", resp.Status, resp.Message)
+	// // TODO add traintuple key to output struct
+	// // For now we test it as cleanly as its added to the query response
+	// assert.Contains(t, string(resp.Payload), "key\":\""+compositeTraintupleKey)
+	// var queryTraintuples []outputCompositeTraintuple
+	// err = json.Unmarshal(resp.Payload, &queryTraintuples)
+	// assert.NoError(t, err, "composite traintuples should unmarshal without problem")
+	// assert.Exactly(t, out, queryTraintuples[0])
 
-// 	// Add traintuple with inmodel from the above-submitted traintuple
-// 	inpWaitingTraintuple := inputCompositeTraintuple{
-// 		InModels: []string{string(traintupleKey)},
-// 	}
-// 	args = inpWaitingTraintuple.createDefault()
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 200, resp.Status, "when adding traintuple with status %d and message %s", resp.Status, resp.Message)
-// 	//waitingTraintupleKey := string(resp.Payload)
+	// // Add traintuple with inmodel from the above-submitted traintuple
+	// inpWaitingTraintuple := inputCompositeTraintuple{
+	// 	InModels: []string{string(traintupleKey)},
+	// }
+	// args = inpWaitingTraintuple.createDefault()
+	// resp = mockStub.MockInvoke("42", args)
+	// assert.EqualValuesf(t, 200, resp.Status, "when adding traintuple with status %d and message %s", resp.Status, resp.Message)
+	// //waitingTraintupleKey := string(resp.Payload)
 
-// 	// Query traintuple with status todo and worker as trainworker and check consistency
-// 	filter := inputQueryFilter{
-// 		IndexName:  "traintuple~worker~status",
-// 		Attributes: worker + ", todo",
-// 	}
-// 	args = [][]byte{[]byte("queryFilter"), assetToJSON(filter)}
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 200, resp.Status, "when querying traintuple of worker with todo status - status %d and message %s", resp.Status, resp.Message)
-// 	err = json.Unmarshal(resp.Payload, &queryTraintuples)
-// 	assert.NoError(t, err, "traintuples should unmarshal without problem")
-// 	assert.Exactly(t, out, queryTraintuples[0])
+	// // Query traintuple with status todo and worker as trainworker and check consistency
+	// filter := inputQueryFilter{
+	// 	IndexName:  "traintuple~worker~status",
+	// 	Attributes: worker + ", todo",
+	// }
+	// args = [][]byte{[]byte("queryFilter"), assetToJSON(filter)}
+	// resp = mockStub.MockInvoke("42", args)
+	// assert.EqualValuesf(t, 200, resp.Status, "when querying traintuple of worker with todo status - status %d and message %s", resp.Status, resp.Message)
+	// err = json.Unmarshal(resp.Payload, &queryTraintuples)
+	// assert.NoError(t, err, "traintuples should unmarshal without problem")
+	// assert.Exactly(t, out, queryTraintuples[0])
 
-// 	// Update status and check consistency
-// 	success := inputLogSuccessTrain{}
-// 	success.Key = traintupleKey
+	// // Update status and check consistency
+	// success := inputLogSuccessTrain{}
+	// success.Key = traintupleKey
 
-// 	argsSlice := [][][]byte{
-// 		[][]byte{[]byte("logStartTrain"), keyToJSON(traintupleKey)},
-// 		success.createDefault(),
-// 	}
-// 	traintupleStatus := []string{StatusDoing, StatusDone}
-// 	for i := range traintupleStatus {
-// 		resp = mockStub.MockInvoke("42", argsSlice[i])
-// 		require.EqualValuesf(t, 200, resp.Status, "when logging start %s with message %s", traintupleStatus[i], resp.Message)
-// 		filter := inputQueryFilter{
-// 			IndexName:  "traintuple~worker~status",
-// 			Attributes: worker + ", " + traintupleStatus[i],
-// 		}
-// 		args = [][]byte{[]byte("queryFilter"), assetToJSON(filter)}
-// 		resp = mockStub.MockInvoke("42", args)
-// 		assert.EqualValuesf(t, 200, resp.Status, "when querying traintuple of worker with %s status - message %s", traintupleStatus[i], resp.Message)
-// 		sPayload := make([]map[string]interface{}, 1)
-// 		assert.NoError(t, json.Unmarshal(resp.Payload, &sPayload), "when unmarshal queried traintuples")
-// 		assert.EqualValues(t, traintupleKey, sPayload[0]["key"], "wrong retrieved key when querying traintuple of worker with %s status ", traintupleStatus[i])
-// 		assert.EqualValues(t, traintupleStatus[i], sPayload[0]["status"], "wrong retrieved status when querying traintuple of worker with %s status ", traintupleStatus[i])
-// 	}
+	// argsSlice := [][][]byte{
+	// 	[][]byte{[]byte("logStartTrain"), keyToJSON(traintupleKey)},
+	// 	success.createDefault(),
+	// }
+	// traintupleStatus := []string{StatusDoing, StatusDone}
+	// for i := range traintupleStatus {
+	// 	resp = mockStub.MockInvoke("42", argsSlice[i])
+	// 	require.EqualValuesf(t, 200, resp.Status, "when logging start %s with message %s", traintupleStatus[i], resp.Message)
+	// 	filter := inputQueryFilter{
+	// 		IndexName:  "traintuple~worker~status",
+	// 		Attributes: worker + ", " + traintupleStatus[i],
+	// 	}
+	// 	args = [][]byte{[]byte("queryFilter"), assetToJSON(filter)}
+	// 	resp = mockStub.MockInvoke("42", args)
+	// 	assert.EqualValuesf(t, 200, resp.Status, "when querying traintuple of worker with %s status - message %s", traintupleStatus[i], resp.Message)
+	// 	sPayload := make([]map[string]interface{}, 1)
+	// 	assert.NoError(t, json.Unmarshal(resp.Payload, &sPayload), "when unmarshal queried traintuples")
+	// 	assert.EqualValues(t, traintupleKey, sPayload[0]["key"], "wrong retrieved key when querying traintuple of worker with %s status ", traintupleStatus[i])
+	// 	assert.EqualValues(t, traintupleStatus[i], sPayload[0]["status"], "wrong retrieved status when querying traintuple of worker with %s status ", traintupleStatus[i])
+	// }
 
-// 	// Query CompositeTraintuple From key
-// 	args = [][]byte{[]byte("queryTraintuple"), keyToJSON(traintupleKey)}
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 200, resp.Status, "when querying traintuple with status %d and message %s", resp.Status, resp.Message)
-// 	endTraintuple := outputCompositeTraintuple{}
-// 	assert.NoError(t, json.Unmarshal(resp.Payload, &endTraintuple))
-// 	expected.Dataset.Perf = success.Perf
-// 	expected.Log = success.Log
-// 	expected.OutModel = &HashDress{
-// 		Hash:           modelHash,
-// 		StorageAddress: modelAddress}
-// 	expected.Status = traintupleStatus[1]
-// 	assert.Exactly(t, expected, endTraintuple, "retreived CompositeTraintuple does not correspond to what is expected")
+	// // Query CompositeTraintuple From key
+	// args = [][]byte{[]byte("queryTraintuple"), keyToJSON(traintupleKey)}
+	// resp = mockStub.MockInvoke("42", args)
+	// assert.EqualValuesf(t, 200, resp.Status, "when querying traintuple with status %d and message %s", resp.Status, resp.Message)
+	// endTraintuple := outputCompositeTraintuple{}
+	// assert.NoError(t, json.Unmarshal(resp.Payload, &endTraintuple))
+	// expected.Dataset.Perf = success.Perf
+	// expected.Log = success.Log
+	// expected.OutModel = &HashDress{
+	// 	Hash:           modelHash,
+	// 	StorageAddress: modelAddress}
+	// expected.Status = traintupleStatus[1]
+	// assert.Exactly(t, expected, endTraintuple, "retreived CompositeTraintuple does not correspond to what is expected")
 
-// 	// query all traintuples related to a traintuple with the same algo
-// 	args = [][]byte{[]byte("queryModelDetails"), keyToJSON(traintupleKey)}
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 200, resp.Status, "when querying model details with status %d and message %s", resp.Status, resp.Message)
-// 	payload := outputModelDetails{}
-// 	assert.NoError(t, json.Unmarshal(resp.Payload, &payload))
-// 	assert.NotNil(t, payload.CompositeTraintuple, "when querying model tuples, payload should contain one traintuple")
+	// // query all traintuples related to a traintuple with the same algo
+	// args = [][]byte{[]byte("queryModelDetails"), keyToJSON(traintupleKey)}
+	// resp = mockStub.MockInvoke("42", args)
+	// assert.EqualValuesf(t, 200, resp.Status, "when querying model details with status %d and message %s", resp.Status, resp.Message)
+	// payload := outputModelDetails{}
+	// assert.NoError(t, json.Unmarshal(resp.Payload, &payload))
+	// assert.NotNil(t, payload.CompositeTraintuple, "when querying model tuples, payload should contain one traintuple")
 
-// 	// query all traintuples related to a traintuple with the same algo
-// 	args = [][]byte{[]byte("queryModels")}
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 200, resp.Status, "when querying models with status %d and message %s", resp.Status, resp.Message)
-// }
+	// // query all traintuples related to a traintuple with the same algo
+	// args = [][]byte{[]byte("queryModels")}
+	// resp = mockStub.MockInvoke("42", args)
+	// assert.EqualValuesf(t, 200, resp.Status, "when querying models with status %d and message %s", resp.Status, resp.Message)
+}
 
 func TestQueryTraintupleNotFoundComposite(t *testing.T) {
 	scc := new(SubstraChaincode)
