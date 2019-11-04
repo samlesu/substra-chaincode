@@ -37,7 +37,7 @@ func TestCompositeTraintupleWithNoTestDataset(t *testing.T) {
 	resp := mockStub.MockInvoke("42", methodAndAssetToByte("registerObjective", inpObjective))
 	assert.EqualValues(t, 200, resp.Status, "when adding objective without dataset it should work: ", resp.Message)
 
-	inpAlgo := inputAlgo{}
+	inpAlgo := inputCompositeAlgo{}
 	args := inpAlgo.createDefault()
 	resp = mockStub.MockInvoke("42", args)
 	assert.EqualValues(t, 200, resp.Status, "when adding algo it should work: ", resp.Message)
@@ -109,15 +109,11 @@ func TestCreateCompositeTraintupleInModels(t *testing.T) {
 			resp = mockStub.MockInvoke("42", args)
 			assert.EqualValues(t, 200, resp.Status, "when adding algo it should work: ", resp.Message)
 
-			inpTraintuple := inputCompositeTraintuple{
-				ObjectiveKey: objHash,
-				AlgoKey:      compositeAlgoHash}
+			inpTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
 
 			if tt.withInModelHead {
 				// create head traintuple
-				inpHeadTraintuple := inputCompositeTraintuple{
-					ObjectiveKey: objHash,
-					AlgoKey:      compositeAlgoHash}
+				inpHeadTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
 				// make the traintuple unique so that it has a unique hash
 				inpHeadTraintuple.DataSampleKeys = []string{trainDataSampleHash1}
 				args = inpHeadTraintuple.createDefault()
@@ -131,9 +127,7 @@ func TestCreateCompositeTraintupleInModels(t *testing.T) {
 
 			if tt.withInModelTrunk {
 				// create trunk traintuple
-				inpTrunkTraintuple := inputCompositeTraintuple{
-					ObjectiveKey: objHash,
-					AlgoKey:      compositeAlgoHash}
+				inpTrunkTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
 				// make the traintuple unique so that it has a unique hash
 				inpTrunkTraintuple.DataSampleKeys = []string{trainDataSampleHash2}
 				args = inpTrunkTraintuple.createDefault()
@@ -233,9 +227,7 @@ func testTraintupleInModelTypes(t *testing.T, headType AssetType, trunkType Asse
 	args = inpCompAlgo.createDefault()
 	resp = mockStub.MockInvoke("42", args)
 
-	inpTraintuple := inputCompositeTraintuple{
-		ObjectiveKey: objHash,
-		AlgoKey:      compositeAlgoHash}
+	inpTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
 
 	head, err := registerTraintuple(mockStub, headType, []string{trainDataSampleHash1})
 	assert.NoError(t, err)
@@ -284,7 +276,7 @@ func TestTraintuplePermissions(t *testing.T) {
 	inpObjective.TestDataset = inputDataset{}
 	resp := mockStub.MockInvoke("42", methodAndAssetToByte("registerObjective", inpObjective))
 
-	inpAlgo := inputAlgo{}
+	inpAlgo := inputCompositeAlgo{}
 	args := inpAlgo.createDefault()
 	resp = mockStub.MockInvoke("42", args)
 
@@ -324,13 +316,14 @@ func TestTraintupleWithSingleDatasampleComposite(t *testing.T) {
 	resp := mockStub.MockInvoke("42", methodAndAssetToByte("registerObjective", inpObjective))
 	assert.EqualValues(t, 200, resp.Status, "when adding objective without dataset it should work: ", resp.Message)
 
-	inpAlgo := inputAlgo{}
+	inpAlgo := inputCompositeAlgo{}
 	args := inpAlgo.createDefault()
 	resp = mockStub.MockInvoke("42", args)
 	assert.EqualValues(t, 200, resp.Status, "when adding algo it should work: ", resp.Message)
 
 	inpTraintuple := inputCompositeTraintuple{
 		ObjectiveKey:   objHash,
+		AlgoKey:        compositeAlgoHash,
 		DataSampleKeys: []string{trainDataSampleHash1},
 	}
 	args = inpTraintuple.createDefault()
@@ -824,14 +817,19 @@ func TestTraintupleWithSingleDatasampleComposite(t *testing.T) {
 func TestInsertTraintupleTwiceComposite(t *testing.T) {
 	scc := new(SubstraChaincode)
 	mockStub := NewMockStubWithRegisterNode("substra", scc)
-	registerItem(t, *mockStub, "algo")
+	registerItem(t, *mockStub, "trainDataset")
+
+	inpAlgo := inputCompositeAlgo{}
+	args := inpAlgo.createDefault()
+	resp := mockStub.MockInvoke("42", args)
+	assert.EqualValues(t, 200, resp.Status, "when adding algo it should work: ", resp.Message)
 
 	// create a composite traintuple and start a ComplutePlan
 	inpTraintuple := inputCompositeTraintuple{
 		Rank: "0",
 	}
 	inpTraintuple.createDefault()
-	resp := mockStub.MockInvoke("42", methodAndAssetToByte("createCompositeTraintuple", inpTraintuple))
+	resp = mockStub.MockInvoke("42", methodAndAssetToByte("createCompositeTraintuple", inpTraintuple))
 	assert.EqualValues(t, http.StatusOK, resp.Status)
 	var _key struct{ Key string }
 	json.Unmarshal(resp.Payload, &_key)

@@ -187,7 +187,7 @@ func (traintuple *inputCompositeTraintuple) createDefault() [][]byte {
 
 func (traintuple *inputCompositeTraintuple) fillDefaults() {
 	if traintuple.AlgoKey == "" {
-		traintuple.AlgoKey = algoHash
+		traintuple.AlgoKey = compositeAlgoHash
 	}
 	if traintuple.ObjectiveKey == "" {
 		traintuple.ObjectiveKey = objectiveDescriptionHash
