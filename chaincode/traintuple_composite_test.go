@@ -792,27 +792,34 @@ func TestTraintupleWithSingleDatasampleComposite(t *testing.T) {
 // 	assert.EqualValuesf(t, 200, resp.Status, "when querying models with status %d and message %s", resp.Status, resp.Message)
 // }
 
-// func TestQueryTraintupleNotFoundComposite(t *testing.T) {
-// 	scc := new(SubstraChaincode)
-// 	mockStub := NewMockStubWithRegisterNode("substra", scc)
-// 	registerItem(t, *mockStub, "traintuple")
+func TestQueryTraintupleNotFoundComposite(t *testing.T) {
+	scc := new(SubstraChaincode)
+	mockStub := NewMockStubWithRegisterNode("substra", scc)
+	registerItem(t, *mockStub, "compositealgo")
 
-// 	// queryTraintuple: normal case
-// 	args := [][]byte{[]byte("queryTraintuple"), keyToJSON(traintupleKey)}
-// 	resp := mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 200, resp.Status, "when querying the traintuple - status %d and message %s", resp.Status, resp.Message)
+	inpTraintuple := inputCompositeTraintuple{}
+	inpTraintuple.fillDefaults()
+	args := inpTraintuple.getArgs()
+	resp := mockStub.MockInvoke("42", args)
+	var _key struct{ Key string }
+	json.Unmarshal(resp.Payload, &_key)
 
-// 	// queryTraintuple: key does not exist
-// 	notFoundKey := "eedbb7c31f62244c0f34461cc168804227115793d01c270021fe3f7935482eed"
-// 	args = [][]byte{[]byte("queryTraintuple"), keyToJSON(notFoundKey)}
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 404, resp.Status, "when querying the traintuple - status %d and message %s", resp.Status, resp.Message)
+	// queryCompositeTraintuple: normal queryCompositeTraintuple
+	args = [][]byte{[]byte("queryCompositeTraintuple"), keyToJSON(_key.Key)}
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValuesf(t, 200, resp.Status, "when querying the composite traintuple - status %d and message %s", resp.Status, resp.Message)
 
-// 	// queryTraintuple: key does not exist and use existing other asset type key
-// 	args = [][]byte{[]byte("queryTraintuple"), keyToJSON(algoHash)}
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValuesf(t, 404, resp.Status, "when querying the traintuple - status %d and message %s", resp.Status, resp.Message)
-// }
+	// queryCompositeTraintuple: key does not exist
+	notFoundKey := "eedbb7c31f62244c0f34461cc168804227115793d01c270021fe3f7935482eed"
+	args = [][]byte{[]byte("queryCompositeTraintuple"), keyToJSON(notFoundKey)}
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValuesf(t, 404, resp.Status, "when querying the composite traintuple - status %d and message %s", resp.Status, resp.Message)
+
+	// queryCompositeTraintuple: key does not exist and use existing other asset type key
+	args = [][]byte{[]byte("queryCompositeTraintuple"), keyToJSON(algoHash)}
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValuesf(t, 404, resp.Status, "when querying the composite traintuple - status %d and message %s", resp.Status, resp.Message)
+}
 
 func TestInsertTraintupleTwiceComposite(t *testing.T) {
 	scc := new(SubstraChaincode)
