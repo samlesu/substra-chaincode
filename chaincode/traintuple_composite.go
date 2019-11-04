@@ -107,33 +107,31 @@ func (traintuple *CompositeTraintuple) SetFromInput(db LedgerDB, inp inputCompos
 // Also it's InModelKeys are set.
 // TODO: rename to SetInModels
 func (traintuple *CompositeTraintuple) SetFromParents(db LedgerDB, inp inputCompositeTraintuple) error {
-	status := StatusTodo
+	traintuple.Status = StatusTodo
+	if inp.InHeadModelKey == "" || inp.InTrunkModelKey == "" {
+		return nil
+	}
 
 	// head
-	if inp.InHeadModelKey != "" {
-		hashDress, err := db.GetOutModelHashDress(inp.InHeadModelKey, HeadType, []AssetType{TraintupleType, CompositeTraintupleType})
-		if err != nil {
-			return err
-		}
-		if hashDress == nil {
-			status = StatusWaiting
-		}
-		traintuple.InModelHead = inp.InHeadModelKey
+	hashDress, err := db.GetOutModelHashDress(inp.InHeadModelKey, HeadType, []AssetType{TraintupleType, CompositeTraintupleType})
+	if err != nil {
+		return err
 	}
+	if hashDress == nil {
+		traintuple.Status = StatusWaiting
+	}
+	traintuple.InModelHead = inp.InHeadModelKey
 
 	// trunk
-	if inp.InTrunkModelKey != "" {
-		hashDress, err := db.GetOutModelHashDress(inp.InTrunkModelKey, TrunkType, []AssetType{TraintupleType, CompositeTraintupleType /* TODO: add AggregateTraintupleTYpe */})
-		if err != nil {
-			return err
-		}
-		if hashDress == nil {
-			status = StatusWaiting
-		}
-		traintuple.InModelTrunk = inp.InTrunkModelKey
+	hashDress, err = db.GetOutModelHashDress(inp.InTrunkModelKey, TrunkType, []AssetType{TraintupleType, CompositeTraintupleType /* TODO: add AggregateTraintupleTYpe */})
+	if err != nil {
+		return err
 	}
+	if hashDress == nil {
+		traintuple.Status = StatusWaiting
+	}
+	traintuple.InModelTrunk = inp.InTrunkModelKey
 
-	traintuple.Status = status
 	return nil
 }
 
