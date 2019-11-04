@@ -421,73 +421,75 @@ func TestTraintupleWithDuplicatedDatasamplesComposite(t *testing.T) {
 // // 	assert.EqualValues(t, tag, testtuples[0].Tag)
 
 // // }
-// func TestNoPanicWhileQueryingIncompleteCompositeTraintuple(t *testing.T) {
-// 	scc := new(SubstraChaincode)
-// 	mockStub := NewMockStubWithRegisterNode("substra", scc)
-// 	// Add a some dataManager, dataSample and traintuple
-// 	registerItem(t, *mockStub, "traintuple")
 
-// 	// Manually open a ledger transaction
-// 	mockStub.MockTransactionStart("42")
-// 	defer mockStub.MockTransactionEnd("42")
+func TestNoPanicWhileQueryingIncompleteCompositeTraintuple(t *testing.T) {
+	scc := new(SubstraChaincode)
+	mockStub := NewMockStubWithRegisterNode("substra", scc)
+	// Add a some dataManager, dataSample and traintuple
+	registerItem(t, *mockStub, "traintuple")
 
-// 	// Retreive and alter existing objectif to pass Metrics at nil
-// 	db := NewLedgerDB(mockStub)
-// 	objective, err := db.GetObjective(objectiveDescriptionHash)
-// 	assert.NoError(t, err)
-// 	objective.Metrics = nil
-// 	objBytes, err := json.Marshal(objective)
-// 	assert.NoError(t, err)
-// 	err = mockStub.PutState(objectiveDescriptionHash, objBytes)
-// 	assert.NoError(t, err)
-// 	// It should not panic
-// 	require.NotPanics(t, func() {
-// 		getOutputTraintuple(NewLedgerDB(mockStub), traintupleKey)
-// 	})
-// }
-// func TestTraintupleComputePlanCreationComposite(t *testing.T) {
-// 	scc := new(SubstraChaincode)
-// 	mockStub := NewMockStubWithRegisterNode("substra", scc)
+	// Manually open a ledger transaction
+	mockStub.MockTransactionStart("42")
+	defer mockStub.MockTransactionEnd("42")
 
-// 	// Add dataManager, dataSample and algo
-// 	registerItem(t, *mockStub, "algo")
+	// Retreive and alter existing objectif to pass Metrics at nil
+	db := NewLedgerDB(mockStub)
+	objective, err := db.GetObjective(objectiveDescriptionHash)
+	assert.NoError(t, err)
+	objective.Metrics = nil
+	objBytes, err := json.Marshal(objective)
+	assert.NoError(t, err)
+	err = mockStub.PutState(objectiveDescriptionHash, objBytes)
+	assert.NoError(t, err)
+	// It should not panic
+	require.NotPanics(t, func() {
+		getOutputCompositeTraintuple(NewLedgerDB(mockStub), traintupleKey)
+	})
+}
 
-// 	inpTraintuple := inputCompositeTraintuple{ComputePlanID: "someComputePlanID"}
-// 	args := inpTraintuple.createDefault()
-// 	resp := mockStub.MockInvoke("42", args)
-// 	require.EqualValues(t, 400, resp.Status, "should failed for missing rank")
-// 	require.Contains(t, resp.Message, "invalid inputs, a ComputePlan should have a rank", "invalid error message")
+func TestTraintupleComputePlanCreationComposite(t *testing.T) {
+	scc := new(SubstraChaincode)
+	mockStub := NewMockStubWithRegisterNode("substra", scc)
 
-// 	inpTraintuple = inputCompositeTraintuple{Rank: "1"}
-// 	args = inpTraintuple.createDefault()
-// 	resp = mockStub.MockInvoke("42", args)
-// 	require.EqualValues(t, 400, resp.Status, "should failed for invalid rank")
-// 	require.Contains(t, resp.Message, "invalid inputs, a new ComputePlan should have a rank 0")
+	// Add dataManager, dataSample and algo
+	registerItem(t, *mockStub, "compositealgo")
 
-// 	inpTraintuple = inputCompositeTraintuple{Rank: "0"}
-// 	args = inpTraintuple.createDefault()
-// 	resp = mockStub.MockInvoke("42", args)
-// 	assert.EqualValues(t, 200, resp.Status)
-// 	res := map[string]string{}
-// 	err := json.Unmarshal(resp.Payload, &res)
-// 	assert.NoError(t, err, "should unmarshal without problem")
-// 	assert.Contains(t, res, "key")
-// 	key := res["key"]
-// 	require.EqualValues(t, key, traintupleKey)
+	inpTraintuple := inputCompositeTraintuple{ComputePlanID: "someComputePlanID"}
+	args := inpTraintuple.createDefault()
+	resp := mockStub.MockInvoke("42", args)
+	require.EqualValues(t, 400, resp.Status, "should failed for missing rank")
+	require.Contains(t, resp.Message, "invalid inputs, a ComputePlan should have a rank", "invalid error message")
 
-// 	inpTraintuple = inputCompositeTraintuple{Rank: "0"}
-// 	args = inpTraintuple.createDefault()
-// 	resp = mockStub.MockInvoke("42", args)
-// 	require.EqualValues(t, 409, resp.Status, "should failed for existing ComputePlanID")
-// 	require.Contains(t, resp.Message, "already exists")
+	inpTraintuple = inputCompositeTraintuple{Rank: "1"}
+	args = inpTraintuple.createDefault()
+	resp = mockStub.MockInvoke("42", args)
+	require.EqualValues(t, 400, resp.Status, "should failed for invalid rank")
+	require.Contains(t, resp.Message, "invalid inputs, a new ComputePlan should have a rank 0")
 
-// 	require.EqualValues(t, 409, resp.Status, "should failed for existing FLTask")
-// 	errorPayload := map[string]interface{}{}
-// 	err = json.Unmarshal(resp.Payload, &errorPayload)
-// 	assert.NoError(t, err, "should unmarshal without problem")
-// 	require.Contains(t, errorPayload, "key", "key should be available in payload")
-// 	assert.EqualValues(t, traintupleKey, errorPayload["key"], "key in error should be traintupleKey")
-// }
+	inpTraintuple = inputCompositeTraintuple{Rank: "0"}
+	args = inpTraintuple.createDefault()
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValues(t, 200, resp.Status)
+	res := map[string]string{}
+	err := json.Unmarshal(resp.Payload, &res)
+	assert.NoError(t, err, "should unmarshal without problem")
+	assert.Contains(t, res, "key")
+	key := res["key"]
+	require.EqualValues(t, key, compositeTraintupleKey)
+
+	inpTraintuple = inputCompositeTraintuple{Rank: "0"}
+	args = inpTraintuple.createDefault()
+	resp = mockStub.MockInvoke("42", args)
+	require.EqualValues(t, 409, resp.Status, "should failed for existing ComputePlanID")
+	require.Contains(t, resp.Message, "already exists")
+
+	require.EqualValues(t, 409, resp.Status, "should failed for existing FLTask")
+	errorPayload := map[string]interface{}{}
+	err = json.Unmarshal(resp.Payload, &errorPayload)
+	assert.NoError(t, err, "should unmarshal without problem")
+	require.Contains(t, errorPayload, "key", "key should be available in payload")
+	assert.EqualValues(t, compositeTraintupleKey, errorPayload["key"], "key in error should be compositeTraintupleKey")
+}
 
 func TestTraintupleMultipleCommputePlanCreationsComposite(t *testing.T) {
 	scc := new(SubstraChaincode)
