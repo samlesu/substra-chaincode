@@ -86,7 +86,7 @@ func TestTraintupleWithSingleDatasample(t *testing.T) {
 
 func TestTraintupleWithDuplicatedDatasamples(t *testing.T) {
 	scc := new(SubstraChaincode)
-	mockStub := NewMockStub("substra", scc)
+	mockStub := NewMockStubWithRegisterNode("substra", scc)
 	registerItem(t, *mockStub, "trainDataset")
 
 	objHash := strings.ReplaceAll(objectiveDescriptionHash, "1", "2")
