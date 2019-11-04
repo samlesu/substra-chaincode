@@ -88,7 +88,8 @@ func (outputCompositeTraintuple *outputCompositeTraintuple) Fill(db LedgerDB, tr
 
 	// fill in-model (head)
 	if traintuple.InModelHead != "" {
-		hashDress, _err := db.GetOutModelHashDress(traintuple.InModelHead, HeadType, []AssetType{TraintupleType, CompositeTraintupleType})
+		// Head can only be a composite traintuple's head out model
+		hashDress, _err := db.GetOutModelHashDress(traintuple.InModelHead, HeadType, []AssetType{CompositeTraintupleType})
 		if _err != nil {
 			err = fmt.Errorf("could not fill (head) in-model with key \"%s\": %s", traintuple.InModelHead, _err.Error())
 			return
@@ -104,6 +105,10 @@ func (outputCompositeTraintuple *outputCompositeTraintuple) Fill(db LedgerDB, tr
 
 	// fill in-model (trunk)
 	if traintuple.InModelTrunk != "" {
+		// Trunk can be either:
+		// - a traintuple's out model
+		// - a composite traintuple's head out model
+		// - an aggregate traintuple's out model
 		hashDress, _err := db.GetOutModelHashDress(traintuple.InModelTrunk, TrunkType, []AssetType{TraintupleType, CompositeTraintupleType /* TODO: add AggregateTraintupleTYpe */})
 		if _err != nil {
 			err = fmt.Errorf("could not fill (trunk) in-model with key \"%s\": %s", traintuple.InModelTrunk, _err.Error())

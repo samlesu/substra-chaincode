@@ -190,17 +190,23 @@ func registerTraintuple(mockStub *MockStub, assetType AssetType, dataSampleKeys 
 	}
 }
 
-// TODO: add more tests:
-// head:
-// - regular head
-// - composite head
-// trunk:
-// - regular trunk
-// - composite trunk
-// - aggregate trunk
-func TestTraintupleRegularHead(t *testing.T) {
-	message := "It should be possible to registering a traintuple with a regular traintuple as a head"
+func TestTraintupleInModelTypes(t *testing.T) {
+	// Head: can only be a composite traintuple's head out model
+	// Trunk: it can be either:
+	// - a traintuple's out model
+	// - a composite traintuple's head out model
+	// - an aggregate traintuple's out model
+	for _, headType := range []AssetType{CompositeTraintupleType} {
+		for _, trunkType := range []AssetType{TraintupleType, CompositeTraintupleType /* TODO: AggregateTraintupleType */} {
+			testName := fmt.Sprintf("TestTraintuple_%s_HeadInModel_%s_TrunkInModel", headType.ToString(), trunkType.ToString())
+			t.Run(testName, func(t *testing.T) {
+				testTraintupleInModelTypes(t, headType, trunkType)
+			})
+		}
+	}
+}
 
+func testTraintupleInModelTypes(t *testing.T, headType AssetType, trunkType AssetType) {
 	scc := new(SubstraChaincode)
 	mockStub := NewMockStubWithRegisterNode("substra", scc)
 	registerItem(t, *mockStub, "trainDataset")
@@ -217,11 +223,11 @@ func TestTraintupleRegularHead(t *testing.T) {
 
 	inpTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
 
-	head, err := registerTraintuple(mockStub, TraintupleType, []string{trainDataSampleHash1})
+	head, err := registerTraintuple(mockStub, headType, []string{trainDataSampleHash1})
 	assert.NoError(t, err)
 	inpTraintuple.InHeadModelKey = head
 
-	trunk, err := registerTraintuple(mockStub, TraintupleType, []string{trainDataSampleHash2})
+	trunk, err := registerTraintuple(mockStub, trunkType, []string{trainDataSampleHash2})
 	assert.NoError(t, err)
 	inpTraintuple.InTrunkModelKey = trunk
 
@@ -229,7 +235,7 @@ func TestTraintupleRegularHead(t *testing.T) {
 	inpTraintuple.fillDefaults()
 	args = inpTraintuple.getArgs()
 	resp = mockStub.MockInvoke("42", args)
-	assert.EqualValues(t, 200, resp.Status, message+": ", resp.Message)
+	assert.EqualValues(t, 200, resp.Status, "It should be possible to register a traintuple with a %s head and a %s trunk: %s", headType.ToString(), trunkType.ToString(), resp.Message)
 	var keyOnly struct{ Key string }
 	json.Unmarshal(resp.Payload, &keyOnly)
 

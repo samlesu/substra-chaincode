@@ -112,8 +112,9 @@ func (traintuple *CompositeTraintuple) SetFromParents(db LedgerDB, inp inputComp
 		return nil
 	}
 
-	// head
-	hashDress, err := db.GetOutModelHashDress(inp.InHeadModelKey, HeadType, []AssetType{TraintupleType, CompositeTraintupleType})
+	// [Head]
+	// It can only be a composite traintuple's head out model
+	hashDress, err := db.GetOutModelHashDress(inp.InHeadModelKey, HeadType, []AssetType{CompositeTraintupleType})
 	if err != nil {
 		return err
 	}
@@ -122,7 +123,11 @@ func (traintuple *CompositeTraintuple) SetFromParents(db LedgerDB, inp inputComp
 	}
 	traintuple.InModelHead = inp.InHeadModelKey
 
-	// trunk
+	// [Trunk]
+	// It can be either:
+	// - a traintuple's out model
+	// - a composite traintuple's head out model
+	// - an aggregate traintuple's out model
 	hashDress, err = db.GetOutModelHashDress(inp.InTrunkModelKey, TrunkType, []AssetType{TraintupleType, CompositeTraintupleType /* TODO: add AggregateTraintupleTYpe */})
 	if err != nil {
 		return err
