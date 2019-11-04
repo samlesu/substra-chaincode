@@ -198,7 +198,7 @@ func TestTraintupleInModelTypes(t *testing.T) {
 	// - an aggregate traintuple's out model
 	for _, headType := range []AssetType{CompositeTraintupleType} {
 		for _, trunkType := range []AssetType{TraintupleType, CompositeTraintupleType /* TODO: AggregateTraintupleType */} {
-			testName := fmt.Sprintf("TestTraintuple_%s_HeadInModel_%s_TrunkInModel", headType.ToString(), trunkType.ToString())
+			testName := fmt.Sprintf("TestTraintuple_%s_HeadInModel_%s_TrunkInModel", headType, trunkType)
 			t.Run(testName, func(t *testing.T) {
 				testTraintupleInModelTypes(t, headType, trunkType)
 			})
@@ -235,7 +235,7 @@ func testTraintupleInModelTypes(t *testing.T, headType AssetType, trunkType Asse
 	inpTraintuple.fillDefaults()
 	args = inpTraintuple.getArgs()
 	resp = mockStub.MockInvoke("42", args)
-	assert.EqualValues(t, 200, resp.Status, "It should be possible to register a traintuple with a %s head and a %s trunk: %s", headType.ToString(), trunkType.ToString(), resp.Message)
+	assert.EqualValues(t, 200, resp.Status, "It should be possible to register a traintuple with a %s head and a %s trunk: %s", headType, trunkType, resp.Message)
 	var keyOnly struct{ Key string }
 	json.Unmarshal(resp.Payload, &keyOnly)
 

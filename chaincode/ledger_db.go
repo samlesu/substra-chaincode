@@ -284,7 +284,7 @@ func (db *LedgerDB) GetOutModelHashDress(traintupleKey string, modelType Composi
 				case TrunkType:
 					return tuple.OutHeadModel.OutModel, nil
 				default:
-					return nil, fmt.Errorf("GetOutModelHashDress: Unsupported composite model type %s (%v)", modelType.ToString(), modelType)
+					return nil, fmt.Errorf("GetOutModelHashDress: Unsupported composite model type %s (%v)", modelType, modelType)
 				}
 			}
 		case TraintupleType:
@@ -294,11 +294,11 @@ func (db *LedgerDB) GetOutModelHashDress(traintupleKey string, modelType Composi
 			}
 		// TODO: case AggregateTraintuple:
 		default:
-			return nil, fmt.Errorf("GetOutModelHashDress: Unsupported asset type %s (%v)", assetType.ToString(), assetType)
+			return nil, fmt.Errorf("GetOutModelHashDress: Unsupported asset type %s (%v)", assetType, assetType)
 		}
 	}
 
-	return nil, errors.NotFound("GetOutModelHashDress: Could not find traintuple %s (%v) with key \"%s\"", modelType.ToString(), modelType, traintupleKey)
+	return nil, errors.NotFound("GetOutModelHashDress: Could not find traintuple %s (%v) with key \"%s\"", modelType, modelType, traintupleKey)
 }
 
 // GetTesttuple fetches a Testtuple from the ledger using its unique key
