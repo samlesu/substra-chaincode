@@ -469,7 +469,7 @@ func queryCompositeTraintuples(db LedgerDB, args []string) ([]outputCompositeTra
 // Utils for smartcontracts related to composite traintuples
 // ----------------------------------------------------------
 
-// getOutputTraintuple takes as input a traintuple key and returns the outputCompositeTraintuple
+// getOutputCompositeTraintuple takes as input a traintuple key and returns the outputCompositeTraintuple
 func getOutputCompositeTraintuple(db LedgerDB, traintupleKey string) (outTraintuple outputCompositeTraintuple, err error) {
 	traintuple, err := db.GetCompositeTraintuple(traintupleKey)
 	if err != nil {
@@ -479,8 +479,8 @@ func getOutputCompositeTraintuple(db LedgerDB, traintupleKey string) (outTraintu
 	return
 }
 
-// getOutputTraintuples takes as input a list of keys and returns a paylaod containing a list of associated retrieved elements
-func getOutputTraintuplesComposite(db LedgerDB, traintupleKeys []string) (outTraintuples []outputCompositeTraintuple, err error) {
+// getOutputCompositeTraintuples takes as input a list of keys and returns a paylaod containing a list of associated retrieved elements
+func getOutputCompositeTraintuples(db LedgerDB, traintupleKeys []string) (outTraintuples []outputCompositeTraintuple, err error) {
 	for _, key := range traintupleKeys {
 		var outputTraintuple outputCompositeTraintuple
 		outputTraintuple, err = getOutputCompositeTraintuple(db, key)
