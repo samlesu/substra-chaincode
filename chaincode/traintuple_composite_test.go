@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCompositeTraintupleWithNoTestDataset(t *testing.T) {
@@ -103,16 +104,20 @@ func TestCreateCompositeTraintupleInModels(t *testing.T) {
 			resp := mockStub.MockInvoke("42", methodAndAssetToByte("registerObjective", inpObjective))
 			assert.EqualValues(t, 200, resp.Status, "when adding objective without dataset it should work: ", resp.Message)
 
-			inpAlgo := inputAlgo{}
+			inpAlgo := inputCompositeAlgo{}
 			args := inpAlgo.createDefault()
 			resp = mockStub.MockInvoke("42", args)
 			assert.EqualValues(t, 200, resp.Status, "when adding algo it should work: ", resp.Message)
 
-			inpTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
+			inpTraintuple := inputCompositeTraintuple{
+				ObjectiveKey: objHash,
+				AlgoKey:      compositeAlgoHash}
 
 			if tt.withInModelHead {
 				// create head traintuple
-				inpHeadTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
+				inpHeadTraintuple := inputCompositeTraintuple{
+					ObjectiveKey: objHash,
+					AlgoKey:      compositeAlgoHash}
 				// make the traintuple unique so that it has a unique hash
 				inpHeadTraintuple.DataSampleKeys = []string{trainDataSampleHash1}
 				args = inpHeadTraintuple.createDefault()
@@ -126,7 +131,9 @@ func TestCreateCompositeTraintupleInModels(t *testing.T) {
 
 			if tt.withInModelTrunk {
 				// create trunk traintuple
-				inpTrunkTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
+				inpTrunkTraintuple := inputCompositeTraintuple{
+					ObjectiveKey: objHash,
+					AlgoKey:      compositeAlgoHash}
 				// make the traintuple unique so that it has a unique hash
 				inpTrunkTraintuple.DataSampleKeys = []string{trainDataSampleHash2}
 				args = inpTrunkTraintuple.createDefault()
@@ -161,7 +168,7 @@ func TestCreateCompositeTraintupleInModels(t *testing.T) {
 func registerTraintuple(mockStub *MockStub, assetType AssetType, dataSampleKeys []string) (key string, err error) {
 	switch assetType {
 	case CompositeTraintupleType:
-		inpTraintuple := inputCompositeTraintuple{}
+		inpTraintuple := inputCompositeTraintuple{AlgoKey: compositeAlgoHash}
 		inpTraintuple.DataSampleKeys = dataSampleKeys
 		inpTraintuple.fillDefaults()
 		args := inpTraintuple.getArgs()
@@ -222,7 +229,13 @@ func testTraintupleInModelTypes(t *testing.T, headType AssetType, trunkType Asse
 	args := inpAlgo.createDefault()
 	resp = mockStub.MockInvoke("42", args)
 
-	inpTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
+	inpCompAlgo := inputCompositeAlgo{}
+	args = inpCompAlgo.createDefault()
+	resp = mockStub.MockInvoke("42", args)
+
+	inpTraintuple := inputCompositeTraintuple{
+		ObjectiveKey: objHash,
+		AlgoKey:      compositeAlgoHash}
 
 	head, err := registerTraintuple(mockStub, headType, []string{trainDataSampleHash1})
 	assert.NoError(t, err)
@@ -247,11 +260,13 @@ func testTraintupleInModelTypes(t *testing.T, headType AssetType, trunkType Asse
 	traintuple := outputCompositeTraintuple{}
 	json.Unmarshal(resp.Payload, &traintuple)
 
+	require.NotNil(t, traintuple.InModelHead)
 	assert.EqualValues(t, inpTraintuple.InHeadModelKey, traintuple.InModelHead.TraintupleKey)
 	// TODO: test that fields are populated once parent traintuple is "done"
 	// assert.NotEqual(t, "", traintuple.InModelHead.Hash)
 	// assert.NotEqual(t, "", traintuple.InModelHead.StorageAddress)
 
+	require.NotNil(t, traintuple.InModelTrunk)
 	assert.EqualValues(t, inpTraintuple.InTrunkModelKey, traintuple.InModelTrunk.TraintupleKey)
 	// TODO: test that fields are populated once parent traintuple is "done"
 	// assert.NotEqual(t, "", traintuple.InModelTrunk.Hash)
