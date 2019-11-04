@@ -137,7 +137,7 @@ func (assetType AssetType) String() string {
 	case CompositeTraintupleType:
 		return "CompositeTraintuple"
 	default:
-		return "(unknown asset type)"
+		return fmt.Sprintf("(unknown asset type: %d)", assetType)
 	}
 }
 
@@ -149,6 +149,6 @@ func (modelType CompositeModelType) String() string {
 	case TrunkType:
 		return "Trunk"
 	default:
-		return "(unknown model type)"
+		return fmt.Sprintf("(unknown model type: %d)", modelType)
 	}
 }
