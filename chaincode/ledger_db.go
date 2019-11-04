@@ -272,36 +272,33 @@ const (
 
 // GetOutModelHashDress retrieves an out-Model from a traintuple key.
 // Return an error if the traintupleKey was not found.
-func (db *LedgerDB) GetOutModelHashDress(traintupleKey string, modelType CompositeModelType, allowedAssetTypes []AssetType) (hashDress *HashDress, err error) {
+func (db *LedgerDB) GetOutModelHashDress(traintupleKey string, modelType CompositeModelType, allowedAssetTypes []AssetType) (*HashDress, error) {
 	for _, assetType := range allowedAssetTypes {
 		switch AssetType(assetType) {
 		case CompositeTraintupleType:
-			tuple, _err := db.GetCompositeTraintuple(traintupleKey)
-			if _err == nil {
+			tuple, err := db.GetCompositeTraintuple(traintupleKey)
+			if err == nil {
 				switch modelType {
 				case HeadType:
 					return tuple.OutHeadModel.OutModel, nil
 				case TrunkType:
 					return tuple.OutHeadModel.OutModel, nil
 				default:
-					err = fmt.Errorf("GetOutModelHashDress: Unsupported composite model type %v", modelType)
-					return
+					return nil, fmt.Errorf("GetOutModelHashDress: Unsupported composite model type %v", modelType)
 				}
 			}
 		case TraintupleType:
-			tuple, _err := db.GetTraintuple(traintupleKey)
-			if _err == nil {
+			tuple, err := db.GetTraintuple(traintupleKey)
+			if err == nil {
 				return tuple.OutModel, nil
 			}
 		// TODO: case AggregateTraintuple:
 		default:
-			err = fmt.Errorf("GetOutModelHashDress: Unsupported asset type %v", assetType)
-			return
+			return nil, fmt.Errorf("GetOutModelHashDress: Unsupported asset type %v", assetType)
 		}
 	}
 
-	err = fmt.Errorf("GetOutModelHashDress: Could not find traintuple (%v) with key \"%s\"", modelType, traintupleKey)
-	return
+	return nil, errors.NotFound("GetOutModelHashDress: Could not find traintuple (%v) with key \"%s\"", modelType, traintupleKey)
 }
 
 // GetTesttuple fetches a Testtuple from the ledger using its unique key
