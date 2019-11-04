@@ -30,6 +30,7 @@ const (
 	TraintupleType
 	TesttupleType
 	CompositeTraintupleType
+	// when adding a new type here, don't forget to update `ToString()` in utils.go
 )
 
 // Objective is the representation of one of the element type stored in the ledger

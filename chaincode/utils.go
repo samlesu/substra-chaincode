@@ -118,3 +118,37 @@ func GetTxCreator(stub shim.ChaincodeStubInterface) (string, error) {
 
 	return sID.GetMspid(), nil
 }
+
+// ToString returns a string representation for an asset type
+func (assetType AssetType) ToString() string {
+	switch assetType {
+	case ObjectiveType:
+		return "Objective"
+	case DataManagerType:
+		return "DataManager"
+	case DataSampleType:
+		return "DataSample"
+	case AlgoType:
+		return "Algo"
+	case TraintupleType:
+		return "Traintuple"
+	case TesttupleType:
+		return "Testtuple"
+	case CompositeTraintupleType:
+		return "CompositeTraintuple"
+	default:
+		return "(unknown asset type)"
+	}
+}
+
+// ToString returns a string representation for a composite model type
+func (modelType CompositeModelType) ToString() string {
+	switch modelType {
+	case HeadType:
+		return "Head"
+	case TrunkType:
+		return "Trunk"
+	default:
+		return "(unknown model type)"
+	}
+}
