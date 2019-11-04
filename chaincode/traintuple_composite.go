@@ -329,7 +329,7 @@ func logStartCompositeTrain(db LedgerDB, args []string) (outputTraintuple output
 // logSuccessTrainComposite modifies a traintuple by changing its status from doing to done
 // reports logs and associated performances
 func logSuccessCompositeTrain(db LedgerDB, args []string) (outputTraintuple outputCompositeTraintuple, err error) {
-	inp := inputLogSuccessTrainComposite{}
+	inp := inputLogSuccessCompositeTrain{}
 	err = AssetFromJSON(args, &inp)
 	if err != nil {
 		return

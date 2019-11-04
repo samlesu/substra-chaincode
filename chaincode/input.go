@@ -125,7 +125,7 @@ type inputLogSuccessTrain struct {
 	OutModel inputHashDress `validate:"required" json:"outModel"`
 	Perf     float32        `validate:"omitempty" json:"perf"`
 }
-type inputLogSuccessTrainComposite struct {
+type inputLogSuccessCompositeTrain struct {
 	inputLog
 	OutHeadModel  inputHashDress `validate:"required" json:"outHeadModel"`
 	OutTrunkModel inputHashDress `validate:"required" json:"outTrunkModel"`

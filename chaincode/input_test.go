@@ -226,6 +226,34 @@ func (success *inputLogSuccessTrain) createDefault() [][]byte {
 	args := append([][]byte{[]byte("logSuccessTrain")}, assetToJSON(success))
 	return args
 }
+
+func (success *inputLogSuccessCompositeTrain) createDefault() [][]byte {
+	if success.Key == "" {
+		success.Key = compositeTraintupleKey
+	}
+	if success.Log == "" {
+		success.Log = "no error, ah ah ah"
+	}
+	if success.Perf == 0 {
+		success.Perf = 0.9
+	}
+	if success.OutHeadModel.Hash == "" {
+		success.OutHeadModel.Hash = headModelHash
+	}
+	if success.OutHeadModel.StorageAddress == "" {
+		success.OutHeadModel.StorageAddress = headModelAddress
+	}
+	if success.OutTrunkModel.Hash == "" {
+		success.OutTrunkModel.Hash = trunkModelHash
+	}
+	if success.OutTrunkModel.StorageAddress == "" {
+		success.OutTrunkModel.StorageAddress = trunkModelAddress
+	}
+
+	args := append([][]byte{[]byte("logSuccessCompositeTrain")}, assetToJSON(success))
+	return args
+}
+
 func (success *inputLogSuccessTest) createDefault() [][]byte {
 	if success.Key == "" {
 		success.Key = traintupleKey
