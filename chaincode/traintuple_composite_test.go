@@ -328,17 +328,18 @@ func TestTraintupleComposite(t *testing.T) {
 	}
 	assert.Exactly(t, expected, out, "the composite traintuple queried from the ledger differ from expected")
 
-	// // Query all traintuples and check consistency
-	// args = [][]byte{[]byte("queryCompositeTraintuples")}
-	// resp = mockStub.MockInvoke("42", args)
-	// assert.EqualValuesf(t, 200, resp.Status, "when querying composite traintuples - status %d and message %s", resp.Status, resp.Message)
-	// // TODO add traintuple key to output struct
-	// // For now we test it as cleanly as its added to the query response
-	// assert.Contains(t, string(resp.Payload), "key\":\""+compositeTraintupleKey)
-	// var queryTraintuples []outputCompositeTraintuple
-	// err = json.Unmarshal(resp.Payload, &queryTraintuples)
-	// assert.NoError(t, err, "composite traintuples should unmarshal without problem")
-	// assert.Exactly(t, out, queryTraintuples[0])
+	// Query all traintuples and check consistency
+	args = [][]byte{[]byte("queryCompositeTraintuples")}
+	resp = mockStub.MockInvoke("42", args)
+	assert.EqualValuesf(t, 200, resp.Status, "when querying composite traintuples - status %d and message %s", resp.Status, resp.Message)
+	// TODO add traintuple key to output struct
+	// For now we test it as cleanly as its added to the query response
+	assert.Contains(t, string(resp.Payload), "key\":\""+compositeTraintupleKey)
+	var queryTraintuples []outputCompositeTraintuple
+	err = json.Unmarshal(resp.Payload, &queryTraintuples)
+	assert.NoError(t, err, "composite traintuples should unmarshal without problem")
+	require.NotZero(t, queryTraintuples)
+	assert.Exactly(t, out, queryTraintuples[0])
 
 	// add a second (trunk) in-model
 	trunk, err := registerTraintuple(mockStub, CompositeTraintupleType, []string{trainDataSampleHash2})

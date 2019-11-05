@@ -220,27 +220,27 @@ func (traintuple *CompositeTraintuple) Save(db LedgerDB, traintupleKey string) e
 	}
 
 	// create composite keys
-	if err := db.CreateIndex("traintuple~algo~key", []string{"traintuple", traintuple.AlgoKey, traintupleKey}); err != nil {
+	if err := db.CreateIndex("compositeTraintuple~algo~key", []string{"compositeTraintuple", traintuple.AlgoKey, traintupleKey}); err != nil {
 		return err
 	}
-	if err := db.CreateIndex("traintuple~worker~status~key", []string{"traintuple", traintuple.Dataset.Worker, traintuple.Status, traintupleKey}); err != nil {
+	if err := db.CreateIndex("compositeTraintuple~worker~status~key", []string{"compositeTraintuple", traintuple.Dataset.Worker, traintuple.Status, traintupleKey}); err != nil {
 		return err
 	}
 	// TODO: Do we create an index for head/trunk inModel or do we concider that
 	// they are classic inModels ?
-	if err := db.CreateIndex("traintuple~inModel~key", []string{"traintuple", traintuple.InModelHead, traintupleKey}); err != nil {
+	if err := db.CreateIndex("compositeTraintuple~inModel~key", []string{"compositeTraintuple", traintuple.InModelHead, traintupleKey}); err != nil {
 		return err
 	}
-	if err := db.CreateIndex("traintuple~inModel~key", []string{"traintuple", traintuple.InModelTrunk, traintupleKey}); err != nil {
+	if err := db.CreateIndex("compositeTraintuple~inModel~key", []string{"compositeTraintuple", traintuple.InModelTrunk, traintupleKey}); err != nil {
 		return err
 	}
 	if traintuple.ComputePlanID != "" {
-		if err := db.CreateIndex("traintuple~computeplanid~worker~rank~key", []string{"traintuple", traintuple.ComputePlanID, traintuple.Dataset.Worker, strconv.Itoa(traintuple.Rank), traintupleKey}); err != nil {
+		if err := db.CreateIndex("compositeTraintuple~computeplanid~worker~rank~key", []string{"compositeTraintuple", traintuple.ComputePlanID, traintuple.Dataset.Worker, strconv.Itoa(traintuple.Rank), traintupleKey}); err != nil {
 			return err
 		}
 	}
 	if traintuple.Tag != "" {
-		err := db.CreateIndex("traintuple~tag~key", []string{"traintuple", traintuple.Tag, traintupleKey})
+		err := db.CreateIndex("compositeTraintuple~tag~key", []string{"compositeTraintuple", traintuple.Tag, traintupleKey})
 		if err != nil {
 			return err
 		}
@@ -451,7 +451,7 @@ func queryCompositeTraintuples(db LedgerDB, args []string) ([]outputCompositeTra
 		err := errors.BadRequest("incorrect number of arguments, expecting nothing")
 		return outTraintuples, err
 	}
-	elementsKeys, err := db.GetIndexKeys("traintuple~algo~key", []string{"traintuple"})
+	elementsKeys, err := db.GetIndexKeys("compositeTraintuple~algo~key", []string{"compositeTraintuple"})
 	if err != nil {
 		return outTraintuples, err
 	}
@@ -505,8 +505,8 @@ func (traintuple *CompositeTraintuple) validateNewStatus(db LedgerDB, status str
 func (traintuple *CompositeTraintuple) updateTraintupleChildren(db LedgerDB, traintupleKey string, event *TuplesEvent) error {
 
 	// get traintuples having as inModels the input traintuple
-	indexName := "traintuple~inModel~key"
-	childTraintupleKeys, err := db.GetIndexKeys(indexName, []string{"traintuple", traintupleKey})
+	indexName := "compositeTraintuple~inModel~key"
+	childTraintupleKeys, err := db.GetIndexKeys(indexName, []string{"compositeTraintuple", traintupleKey})
 	if err != nil {
 		return fmt.Errorf("error while getting associated traintuples to update their inModel")
 	}
@@ -606,9 +606,9 @@ func (traintuple *CompositeTraintuple) commitStatusUpdate(db LedgerDB, traintupl
 	}
 
 	// update associated composite keys
-	indexName := "traintuple~worker~status~key"
-	oldAttributes := []string{"traintuple", traintuple.Dataset.Worker, oldStatus, traintupleKey}
-	newAttributes := []string{"traintuple", traintuple.Dataset.Worker, traintuple.Status, traintupleKey}
+	indexName := "compositeTraintuple~worker~status~key"
+	oldAttributes := []string{"compositeTraintuple", traintuple.Dataset.Worker, oldStatus, traintupleKey}
+	newAttributes := []string{"compositeTraintuple", traintuple.Dataset.Worker, traintuple.Status, traintupleKey}
 	if err := db.UpdateIndex(indexName, oldAttributes, newAttributes); err != nil {
 		return err
 	}
