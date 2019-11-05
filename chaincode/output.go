@@ -290,7 +290,7 @@ type outputModel struct {
 type TuplesEvent struct {
 	Testtuples           []outputTesttuple           `json:"testtuple"`
 	Traintuples          []outputTraintuple          `json:"traintuple"`
-	CompositeTraintuples []outputCompositeTraintuple `json:"traintuplesComposite"`
+	CompositeTraintuples []outputCompositeTraintuple `json:"compositeTraintuples"`
 }
 
 // SetCompositeTraintuples add one or several testtuples to the event struct
