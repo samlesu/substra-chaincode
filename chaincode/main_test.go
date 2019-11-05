@@ -220,6 +220,10 @@ func registerItem(t *testing.T, mockStub MockStub, itemType string) (peer.Respon
 	args = inpCompositeTraintuple.createDefault()
 	resp = mockStub.MockInvoke("42", args)
 	require.EqualValuesf(t, 200, resp.Status, "when adding composite traintuple with status %d and message %s", resp.Status, resp.Message)
+	if itemType == "compositetraintuple" {
+		return resp, inpTraintuple
+	}
+
 	return resp, inpCompositeTraintuple
 }
 

@@ -709,3 +709,47 @@ func TestTraintuplePermissions(t *testing.T) {
 	assert.EqualValues(t, []string{worker}, traintuple.OutHeadModel.Permissions.Process.AuthorizedIDs,
 		"if input trunk model permissions are set to 'nobody', this should effectively grant permission to the creator only")
 }
+
+func TestCompositeTraintupleLogSuccessFail(t *testing.T) {
+	for _, status := range []string{StatusDone, StatusFailed} {
+		t.Run("TestCompositeTraintupleLog"+status, func(t *testing.T) {
+			scc := new(SubstraChaincode)
+			mockStub := NewMockStubWithRegisterNode("substra", scc)
+			resp, _ := registerItem(t, *mockStub, "compositetraintuple")
+			var _key struct{ Key string }
+			json.Unmarshal(resp.Payload, &_key)
+			key := _key.Key
+
+			// start
+			resp = mockStub.MockInvoke("42", [][]byte{[]byte("logStartCompositeTrain"), keyToJSON(key)})
+
+			var expectedStatus string
+
+			switch status {
+			case StatusDone:
+				success := inputLogSuccessCompositeTrain{}
+				success.Key = key
+				args := success.createDefault()
+				resp = mockStub.MockInvoke("42", args)
+				require.EqualValuesf(t, 200, resp.Status, "traintuple should be successfully set to 'success': %s", resp.Message)
+				expectedStatus = "done"
+			case StatusFailed:
+				failed := inputLogFailTrain{}
+				failed.Key = key
+				failed.fillDefaults()
+				args := failed.getArgsComposite()
+				resp = mockStub.MockInvoke("42", args)
+				require.EqualValuesf(t, 200, resp.Status, "traintuple should be successfully set to 'failed': %s", resp.Message)
+				expectedStatus = "failed"
+			}
+
+			// fetch back
+			args := [][]byte{[]byte("queryCompositeTraintuple"), keyToJSON(key)}
+			resp = mockStub.MockInvoke("42", args)
+			assert.EqualValues(t, 200, resp.Status, "It should find the traintuple without error: %s", resp.Message)
+			traintuple := outputCompositeTraintuple{}
+			json.Unmarshal(resp.Payload, &traintuple)
+			assert.EqualValues(t, expectedStatus, traintuple.Status, "The traintuple status should be set to %s", expectedStatus)
+		})
+	}
+}

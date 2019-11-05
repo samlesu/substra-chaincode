@@ -268,17 +268,29 @@ func (success *inputLogSuccessTest) createDefault() [][]byte {
 	args := append([][]byte{[]byte("logSuccessTest")}, assetToJSON(success))
 	return args
 }
+
 func (fail *inputLogFailTrain) createDefault() [][]byte {
+	fail.fillDefaults()
+	return fail.getArgs()
+}
+
+func (fail *inputLogFailTrain) fillDefaults() {
 	if fail.Key == "" {
 		fail.Key = traintupleKey
 	}
 	if fail.Log == "" {
 		fail.Log = "man, did it failed!"
 	}
-
-	args := append([][]byte{[]byte("logFailTrain")}, assetToJSON(fail))
-	return args
 }
+
+func (fail *inputLogFailTrain) getArgs() [][]byte {
+	return append([][]byte{[]byte("logFailTrain")}, assetToJSON(fail))
+}
+
+func (fail *inputLogFailTrain) getArgsComposite() [][]byte {
+	return append([][]byte{[]byte("logFailCompositeTrain")}, assetToJSON(fail))
+}
+
 func (fail *inputLogFailTest) createDefault() [][]byte {
 	if fail.Key == "" {
 		fail.Key = traintupleKey
