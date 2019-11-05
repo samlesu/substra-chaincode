@@ -180,7 +180,7 @@ func (traintuple *CompositeTraintuple) AddToComputePlan(db LedgerDB, inp inputCo
 		return nil
 	}
 	var ttKeys []string
-	ttKeys, err = db.GetIndexKeys("traintuple~computeplanid~worker~rank~key", []string{"traintuple", inp.ComputePlanID})
+	ttKeys, err = db.GetIndexKeys("compositeTraintuple~computeplanid~worker~rank~key", []string{"compositeTraintuple", inp.ComputePlanID})
 	if err != nil {
 		return err
 	}
@@ -197,7 +197,7 @@ func (traintuple *CompositeTraintuple) AddToComputePlan(db LedgerDB, inp inputCo
 		}
 	}
 
-	ttKeys, err = db.GetIndexKeys("traintuple~computeplanid~worker~rank~key", []string{"traintuple", inp.ComputePlanID, traintuple.Dataset.Worker, inp.Rank})
+	ttKeys, err = db.GetIndexKeys("compositeTraintuple~computeplanid~worker~rank~key", []string{"compositeTraintuple", inp.ComputePlanID, traintuple.Dataset.Worker, inp.Rank})
 	if err != nil {
 		return err
 	} else if len(ttKeys) > 0 {
