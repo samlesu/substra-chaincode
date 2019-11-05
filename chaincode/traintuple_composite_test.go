@@ -488,35 +488,35 @@ func TestInsertTraintupleTwiceComposite(t *testing.T) {
 
 var createInModelTests = []struct {
 	testName         string
-	withInModelHead  bool
-	withInModelTrunk bool
+	withInHeadModel  bool
+	withInTrunkModel bool
 	shouldSucceed    bool
 	expectedStatus   string
 	message          string
 }{
 	{
 		testName:         "NoHeadAndNoTrunk",
-		withInModelHead:  false,
-		withInModelTrunk: false,
+		withInHeadModel:  false,
+		withInTrunkModel: false,
 		shouldSucceed:    true,
 		expectedStatus:   "todo", // no in-models, so we're ready to train
 		message:          "One should be able to create a composite traintuple without head or trunk inModels"},
 	{
 		testName:         "NoHeadAndTrunk",
-		withInModelHead:  true,
-		withInModelTrunk: false,
+		withInHeadModel:  true,
+		withInTrunkModel: false,
 		shouldSucceed:    false,
 		message:          "One should NOT be able to create a composite traintuple with a head inModel unless a trunk inModel is also supplied"},
 	{
 		testName:         "HeadAndNoTrunk",
-		withInModelHead:  false,
-		withInModelTrunk: true,
+		withInHeadModel:  false,
+		withInTrunkModel: true,
 		shouldSucceed:    false,
 		message:          "One should NOT be able to create a composite traintuple with a trunk inModel unless a head inModel is also supplied"},
 	{
 		testName:         "HeadAndTrunk",
-		withInModelHead:  true,
-		withInModelTrunk: true,
+		withInHeadModel:  true,
+		withInTrunkModel: true,
 		shouldSucceed:    true,
 		expectedStatus:   "waiting", // waiting for in models to be done before we can start training
 		message:          "One should be able to create a composite traintuple with both a head and a trunk inModels"}}
@@ -542,7 +542,7 @@ func TestCreateCompositeTraintupleInModels(t *testing.T) {
 
 			inpTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
 
-			if tt.withInModelHead {
+			if tt.withInHeadModel {
 				// create head traintuple
 				inpHeadTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
 				// make the traintuple unique so that it has a unique hash
@@ -556,7 +556,7 @@ func TestCreateCompositeTraintupleInModels(t *testing.T) {
 				inpTraintuple.InHeadModelKey = headTraintuple.Key
 			}
 
-			if tt.withInModelTrunk {
+			if tt.withInTrunkModel {
 				// create trunk traintuple
 				inpTrunkTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
 				// make the traintuple unique so that it has a unique hash
@@ -664,11 +664,11 @@ func testTraintupleInModelTypes(t *testing.T, headType AssetType, trunkType Asse
 	traintuple := outputCompositeTraintuple{}
 	json.Unmarshal(resp.Payload, &traintuple)
 
-	require.NotNil(t, traintuple.InModelHead)
-	assert.EqualValues(t, inpTraintuple.InHeadModelKey, traintuple.InModelHead.TraintupleKey)
+	require.NotNil(t, traintuple.InHeadModel)
+	assert.EqualValues(t, inpTraintuple.InHeadModelKey, traintuple.InHeadModel.TraintupleKey)
 
-	require.NotNil(t, traintuple.InModelTrunk)
-	assert.EqualValues(t, inpTraintuple.InTrunkModelKey, traintuple.InModelTrunk.TraintupleKey)
+	require.NotNil(t, traintuple.InTrunkModel)
+	assert.EqualValues(t, inpTraintuple.InTrunkModelKey, traintuple.InTrunkModel.TraintupleKey)
 }
 
 func TestTraintuplePermissions(t *testing.T) {

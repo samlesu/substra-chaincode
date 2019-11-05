@@ -105,8 +105,8 @@ type CompositeTraintuple struct {
 	ComputePlanID string                      `json:"computePlanID"`
 	Creator       string                      `json:"creator"`
 	Dataset       *Dataset                    `json:"dataset"`
-	InModelHead   string                      `json:"inModelHead"`
-	InModelTrunk  string                      `json:"inModelTrunk"`
+	InHeadModel   string                      `json:"inHeadModel"`
+	InTrunkModel  string                      `json:"inTrunkModel"`
 	Log           string                      `json:"log"`
 	ObjectiveKey  string                      `json:"objectiveKey"`
 	OutHeadModel  CompositeTraintupleOutModel `json:"outHeadModel"`

@@ -121,7 +121,7 @@ func (traintuple *CompositeTraintuple) SetFromParents(db LedgerDB, inp inputComp
 	if hashDress == nil {
 		traintuple.Status = StatusWaiting
 	}
-	traintuple.InModelHead = inp.InHeadModelKey
+	traintuple.InHeadModel = inp.InHeadModelKey
 
 	// [Trunk]
 	// It can be either:
@@ -135,7 +135,7 @@ func (traintuple *CompositeTraintuple) SetFromParents(db LedgerDB, inp inputComp
 	if hashDress == nil {
 		traintuple.Status = StatusWaiting
 	}
-	traintuple.InModelTrunk = inp.InTrunkModelKey
+	traintuple.InTrunkModel = inp.InTrunkModelKey
 
 	return nil
 }
@@ -146,8 +146,8 @@ func (traintuple *CompositeTraintuple) GetKey() string {
 		traintuple.Creator,
 		traintuple.AlgoKey,
 		traintuple.Dataset.DataManagerKey,
-		traintuple.InModelHead,
-		traintuple.InModelTrunk}
+		traintuple.InHeadModel,
+		traintuple.InTrunkModel}
 	hashKeys = append(hashKeys, traintuple.Dataset.DataSampleKeys...)
 	return HashForKey("traintuple", hashKeys...)
 
@@ -228,10 +228,10 @@ func (traintuple *CompositeTraintuple) Save(db LedgerDB, traintupleKey string) e
 	}
 	// TODO: Do we create an index for head/trunk inModel or do we concider that
 	// they are classic inModels ?
-	if err := db.CreateIndex("compositeTraintuple~inModel~key", []string{"compositeTraintuple", traintuple.InModelHead, traintupleKey}); err != nil {
+	if err := db.CreateIndex("compositeTraintuple~inModel~key", []string{"compositeTraintuple", traintuple.InHeadModel, traintupleKey}); err != nil {
 		return err
 	}
-	if err := db.CreateIndex("compositeTraintuple~inModel~key", []string{"compositeTraintuple", traintuple.InModelTrunk, traintupleKey}); err != nil {
+	if err := db.CreateIndex("compositeTraintuple~inModel~key", []string{"compositeTraintuple", traintuple.InTrunkModel, traintupleKey}); err != nil {
 		return err
 	}
 	if traintuple.ComputePlanID != "" {
@@ -573,7 +573,7 @@ func (traintuple *CompositeTraintuple) updateTraintupleChildren(db LedgerDB, tra
 // isReady checks if inModels of a traintuple have been trained, except the newDoneTraintupleKey (since the transaction is not commited)
 // and updates the traintuple status if necessary
 func (traintuple *CompositeTraintuple) isReady(db LedgerDB, newDoneTraintupleKey string) (ready bool, err error) {
-	for _, key := range [2]string{traintuple.InModelHead, traintuple.InModelTrunk} {
+	for _, key := range [2]string{traintuple.InHeadModel, traintuple.InTrunkModel} {
 		// don't check newly done traintuple
 		if key == newDoneTraintupleKey {
 			continue
