@@ -101,7 +101,9 @@ func (testtuple *Testtuple) SetFromInput(db LedgerDB, inp inputTesttuple) error 
 //  - Status
 func (testtuple *Testtuple) SetFromTraintuple(db LedgerDB, traintupleKey string) error {
 
-	var status string
+	var status, tupleCreator string
+	var model *HashDress
+	var permissions Permissions
 
 	creator, err := GetTxCreator(db.cc)
 	if err != nil {
@@ -116,41 +118,38 @@ func (testtuple *Testtuple) SetFromTraintuple(db LedgerDB, traintupleKey string)
 	}
 	switch traintupleType {
 	case TraintupleType:
-		// check associated traintuple
 		traintuple, err := db.GetTraintuple(traintupleKey)
 		if err != nil {
 			return errors.BadRequest(err, "could not retrieve traintuple with key %s", traintupleKey)
 		}
-		if !traintuple.Permissions.CanProcess(traintuple.Creator, creator) {
-			return errors.Forbidden("not authorized to process traintuple %s", traintupleKey)
-		}
+		permissions = traintuple.Permissions
+		tupleCreator = traintuple.Creator
+		status = traintuple.Status
+		model = traintuple.OutModel
 		testtuple.ObjectiveKey = traintuple.ObjectiveKey
 		testtuple.AlgoKey = traintuple.AlgoKey
-		status = traintuple.Status
-		if traintuple.OutModel != nil {
-			testtuple.Model.Hash = traintuple.OutModel.Hash
-			testtuple.Model.StorageAddress = traintuple.OutModel.StorageAddress
-		}
 	case CompositeTraintupleType:
-		// check associated traintuple
 		compositeTraintuple, err := db.GetCompositeTraintuple(traintupleKey)
 		if err != nil {
 			return errors.BadRequest(err, "could not retrieve composite traintuple with key %s", traintupleKey)
 		}
-		if !compositeTraintuple.OutHeadModel.Permissions.CanProcess(compositeTraintuple.Creator, creator) {
-			return errors.Forbidden("not authorized to process traintuple %s", traintupleKey)
-		}
+		permissions = compositeTraintuple.OutHeadModel.Permissions
+		tupleCreator = compositeTraintuple.Creator
+		status = compositeTraintuple.Status
+		model = compositeTraintuple.OutTrunkModel.OutModel
 		testtuple.ObjectiveKey = compositeTraintuple.ObjectiveKey
 		testtuple.AlgoKey = compositeTraintuple.AlgoKey
-		status = compositeTraintuple.Status
-		if compositeTraintuple.OutTrunkModel.OutModel != nil {
-			testtuple.Model.Hash = compositeTraintuple.OutTrunkModel.OutModel.Hash
-			testtuple.Model.StorageAddress = compositeTraintuple.OutTrunkModel.OutModel.StorageAddress
-		}
 	default:
-		return errors.BadRequest("key %s is not a valid traintuple", traintupleKey)
+		return errors.BadRequest("key %s is not a valid traintuple", traintupleKey)
 	}
 
+	if !permissions.CanProcess(tupleCreator, creator) {
+		return errors.Forbidden("not authorized to process traintuple %s", traintupleKey)
+	}
+	if model != nil {
+		testtuple.Model.Hash = model.Hash
+		testtuple.Model.StorageAddress = model.StorageAddress
+	}
 	switch status {
 	case StatusDone:
 		testtuple.Status = StatusTodo

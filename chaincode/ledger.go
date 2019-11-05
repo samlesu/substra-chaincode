@@ -159,7 +159,6 @@ type HashDressName struct {
 // Model stores the traintupleKey leading to the model, its hash and storage addressl
 type Model struct {
 	TraintupleKey  string `json:"traintupleKey"`
-	TraintupleType string `json:"traintupleType"`
 	Hash           string `json:"hash"`
 	StorageAddress string `json:"storageAddress"`
 }

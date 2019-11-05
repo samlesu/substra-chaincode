@@ -207,16 +207,16 @@ func (outputTraintuple *outputTraintuple) Fill(db LedgerDB, traintuple Traintupl
 }
 
 type outputTesttuple struct {
-	Key       string         `json:"key"`
-	Algo      *HashDressName `json:"algo"`
-	Certified bool           `json:"certified"`
-	Creator   string         `json:"creator"`
-	Dataset   *TtDataset     `json:"dataset"`
-	Log       string         `json:"log"`
-	Model     *Model         `json:"model"`
-	Objective *TtObjective   `json:"objective"`
-	Status    string         `json:"status"`
-	Tag       string         `json:"tag"`
+	Key       string                `json:"key"`
+	Algo      *HashDressName        `json:"algo"`
+	Certified bool                  `json:"certified"`
+	Creator   string                `json:"creator"`
+	Dataset   *TtDataset            `json:"dataset"`
+	Log       string                `json:"log"`
+	Model     *outputTesttupleModel `json:"model"`
+	Objective *TtObjective          `json:"objective"`
+	Status    string                `json:"status"`
+	Tag       string                `json:"tag"`
 }
 
 func (out *outputTesttuple) Fill(db LedgerDB, key string, in Testtuple) error {
@@ -225,7 +225,7 @@ func (out *outputTesttuple) Fill(db LedgerDB, key string, in Testtuple) error {
 	out.Creator = in.Creator
 	out.Dataset = in.Dataset
 	out.Log = in.Log
-	out.Model = in.Model
+	out.Model = &outputTesttupleModel{Model: *in.Model}
 	out.Status = in.Status
 	out.Tag = in.Tag
 
@@ -385,4 +385,9 @@ func (out *outputBoardTuple) Fill(db LedgerDB, in Testtuple, testtupleKey string
 	out.Perf = in.Dataset.Perf
 	out.Tag = in.Tag
 	return nil
+}
+
+type outputTesttupleModel struct {
+	Model
+	TraintupleType string `json:"traintupleType"`
 }
