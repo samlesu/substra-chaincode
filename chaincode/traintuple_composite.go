@@ -93,7 +93,7 @@ func (traintuple *CompositeTraintuple) SetFromInput(db LedgerDB, inp inputCompos
 	traintuple.OutHeadModel.Permissions = Permissions{Process: creatorOnly, Download: creatorOnly}
 
 	// permissions (trunk): dictated by input
-	permissions, err := NewPermissions(db, inp.OutTrunkModelPermission)
+	permissions, err := NewPermissions(db, inp.OutTrunkModelPermissions)
 	if err != nil {
 		return err
 	}

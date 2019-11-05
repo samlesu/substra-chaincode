@@ -689,7 +689,7 @@ func TestTraintuplePermissions(t *testing.T) {
 	inpTraintuple := inputCompositeTraintuple{ObjectiveKey: objHash}
 	inpTraintuple.fillDefaults()
 	// Grant trunk model permissions to no-one
-	inpTraintuple.OutTrunkModelPermission = inputPermissions{Process: inputPermission{Public: false, AuthorizedIDs: []string{}}}
+	inpTraintuple.OutTrunkModelPermissions = inputPermissions{Process: inputPermission{Public: false, AuthorizedIDs: []string{}}}
 	args = inpTraintuple.getArgs()
 	resp = mockStub.MockInvoke("42", args)
 
