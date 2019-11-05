@@ -290,12 +290,12 @@ type outputModel struct {
 type TuplesEvent struct {
 	Testtuples           []outputTesttuple           `json:"testtuple"`
 	Traintuples          []outputTraintuple          `json:"traintuple"`
-	TraintuplesComposite []outputCompositeTraintuple `json:"traintuplesComposite"`
+	CompositeTraintuples []outputCompositeTraintuple `json:"traintuplesComposite"`
 }
 
 // SetCompositeTraintuples add one or several testtuples to the event struct
 func (te *TuplesEvent) SetCompositeTraintuples(otuples ...outputCompositeTraintuple) {
-	te.TraintuplesComposite = otuples
+	te.CompositeTraintuples = otuples
 }
 
 // SetTesttuples add one or several testtuples to the event struct
@@ -310,7 +310,7 @@ func (te *TuplesEvent) SetTraintuples(otuples ...outputTraintuple) {
 
 // AddCompositeTraintuple add one traintuple to the event struct
 func (te *TuplesEvent) AddCompositeTraintuple(out outputCompositeTraintuple) {
-	te.TraintuplesComposite = append(te.TraintuplesComposite, out)
+	te.CompositeTraintuples = append(te.CompositeTraintuples, out)
 }
 
 // AddTraintuple add one traintuple to the event struct
