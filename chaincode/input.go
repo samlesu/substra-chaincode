@@ -96,16 +96,16 @@ type inputTraintuple struct {
 
 // inputCompositeTraintuple is the representation of input args to register a Traintuple
 type inputCompositeTraintuple struct {
-	AlgoKey                string           `validate:"required,len=64,hexadecimal" json:"algoKey"`
-	ObjectiveKey           string           `validate:"required,len=64,hexadecimal" json:"objectiveKey"`
-	InHeadModelKey         string           `validate:"required_with=InTrunkModelKey,omitempty,len=64,hexadecimal" json:"inHeadModelKey"`
-	InTrunkModelKey        string           `validate:"required_with=InHeadModelKey,omitempty,len=64,hexadecimal" json:"inTrunkModelKey"`
-	InTrunkModelPermission inputPermissions `validate:"required" json:"InTrunkModelPermission"`
-	DataManagerKey         string           `validate:"required,len=64,hexadecimal" json:"dataManagerKey"`
-	DataSampleKeys         []string         `validate:"required,unique,gt=0,dive,len=64,hexadecimal" json:"dataSampleKeys"`
-	ComputePlanID          string           `validate:"omitempty" json:"computePlanID"`
-	Rank                   string           `validate:"omitempty" json:"rank"`
-	Tag                    string           `validate:"omitempty,lte=64" json:"tag"`
+	AlgoKey                 string           `validate:"required,len=64,hexadecimal" json:"algoKey"`
+	ObjectiveKey            string           `validate:"required,len=64,hexadecimal" json:"objectiveKey"`
+	InHeadModelKey          string           `validate:"required_with=InTrunkModelKey,omitempty,len=64,hexadecimal" json:"inHeadModelKey"`
+	InTrunkModelKey         string           `validate:"required_with=InHeadModelKey,omitempty,len=64,hexadecimal" json:"inTrunkModelKey"`
+	OutTrunkModelPermission inputPermissions `validate:"required" json:"OutTrunkModelPermission"`
+	DataManagerKey          string           `validate:"required,len=64,hexadecimal" json:"dataManagerKey"`
+	DataSampleKeys          []string         `validate:"required,unique,gt=0,dive,len=64,hexadecimal" json:"dataSampleKeys"`
+	ComputePlanID           string           `validate:"omitempty" json:"computePlanID"`
+	Rank                    string           `validate:"omitempty" json:"rank"`
+	Tag                     string           `validate:"omitempty,lte=64" json:"tag"`
 }
 
 // inputTestuple is the representation of input args to register a Testtuple

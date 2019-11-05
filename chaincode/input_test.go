@@ -198,7 +198,7 @@ func (traintuple *inputCompositeTraintuple) fillDefaults() {
 	if traintuple.DataSampleKeys == nil || len(traintuple.DataSampleKeys) == 0 {
 		traintuple.DataSampleKeys = []string{trainDataSampleHash1, trainDataSampleHash2}
 	}
-	traintuple.InTrunkModelPermission = OpenPermissions
+	traintuple.OutTrunkModelPermission = OpenPermissions
 }
 
 func (traintuple *inputCompositeTraintuple) getArgs() [][]byte {
