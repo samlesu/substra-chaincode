@@ -16,6 +16,7 @@ package main
 
 import (
 	"encoding/json"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -111,4 +112,18 @@ func TestConflictCertifiedNonCertifiedTesttuple(t *testing.T) {
 	resp = mockStub.MockInvoke("42", args)
 	assert.EqualValues(t, 409, resp.Status)
 	assert.Contains(t, resp.Message, "already exists")
+}
+
+func TestTesttupleOnCompositeTraintuple(t *testing.T) {
+	scc := new(SubstraChaincode)
+	mockStub := NewMockStubWithRegisterNode("substra", scc)
+
+	registerItem(t, *mockStub, "compositeTraintuple")
+
+	inp := inputTesttuple{
+		TraintupleKey: compositeTraintupleKey,
+	}
+	args := inp.createDefault()
+	resp := mockStub.MockInvoke("42", args)
+	assert.EqualValues(t, http.StatusOK, resp.Status, resp.Message)
 }

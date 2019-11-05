@@ -189,6 +189,18 @@ func (db *LedgerDB) GetIndexKeys(index string, attributes []string) ([]string, e
 // High-level functions
 // ----------------------------------------------
 
+// GetAssetType fetch a object in the chaincode db and return its type.
+// It fails if it does not exists or if it does not have an `AssetType` field.
+func (db *LedgerDB) GetAssetType(key string) (AssetType, error) {
+	asset := struct {
+		AssetType AssetType `json:"assetType"`
+	}{}
+	if err := db.Get(key, &asset); err != nil {
+		return asset.AssetType, err
+	}
+	return asset.AssetType, nil
+}
+
 // GetAlgo fetches an Algo from the ledger using its unique key
 func (db *LedgerDB) GetAlgo(key string) (Algo, error) {
 	algo := Algo{}

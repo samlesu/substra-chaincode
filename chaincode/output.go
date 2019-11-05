@@ -229,10 +229,27 @@ func (out *outputTesttuple) Fill(db LedgerDB, key string, in Testtuple) error {
 	out.Status = in.Status
 	out.Tag = in.Tag
 
-	// fill algo
-	algo, err := db.GetAlgo(in.AlgoKey)
+	// fill type
+	traintupleType, err := db.GetAssetType(in.Model.TraintupleKey)
 	if err != nil {
-		return fmt.Errorf("could not retrieve algo with key %s - %s", in.AlgoKey, err.Error())
+		return fmt.Errorf("could not retrieve traintuple type with key %s - %s", in.Model.TraintupleKey, err.Error())
+	}
+	out.Model.TraintupleType = traintupleType.String()
+
+	// fill algo
+	var algo Algo
+	switch traintupleType {
+	case TraintupleType:
+		algo, err = db.GetAlgo(in.AlgoKey)
+		if err != nil {
+			return fmt.Errorf("could not retrieve algo with key %s - %s", in.AlgoKey, err.Error())
+		}
+	case CompositeTraintupleType:
+		compositeAlgo, err := db.GetCompositeAlgo(in.AlgoKey)
+		if err != nil {
+			return fmt.Errorf("could not retrieve composite algo with key %s - %s", in.AlgoKey, err.Error())
+		}
+		algo = compositeAlgo.Algo
 	}
 	out.Algo = &HashDressName{
 		Name:           algo.Name,
