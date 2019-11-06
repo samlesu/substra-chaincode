@@ -123,19 +123,19 @@ func GetTxCreator(stub shim.ChaincodeStubInterface) (string, error) {
 func (assetType AssetType) String() string {
 	switch assetType {
 	case ObjectiveType:
-		return "Objective"
+		return "objective"
 	case DataManagerType:
-		return "DataManager"
+		return "dataManager"
 	case DataSampleType:
-		return "DataSample"
+		return "dataSample"
 	case AlgoType:
-		return "Algo"
+		return "algo"
 	case TraintupleType:
-		return "Traintuple"
+		return "traintuple"
 	case TesttupleType:
-		return "Testtuple"
+		return "testtuple"
 	case CompositeTraintupleType:
-		return "CompositeTraintuple"
+		return "compositeTraintuple"
 	default:
 		return fmt.Sprintf("(unknown asset type: %d)", assetType)
 	}
